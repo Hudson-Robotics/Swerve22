@@ -37,7 +37,10 @@ public class Drivetrain {
   private final AHRS navx = new AHRS(SPI.Port.kMXP);
 
   private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
-      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
+      m_frontLeftLocation, 
+      m_frontRightLocation, 
+      m_backLeftLocation, 
+      m_backRightLocation);
 
   // private final SwerveDriveOdometry m_odometry = new
   // SwerveDriveOdometry(m_kinematics, m_gyro.getRotation2d());
