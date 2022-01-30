@@ -28,10 +28,10 @@ public class Drivetrain {
   // private final SwerveModule m_backLeft = new SwerveModule(5, 6, 8, 9, 10, 11);
   // private final SwerveModule m_backRight = new SwerveModule(7, 8, 12, 13, 14, 15);
 
-  private final TalonSwerve m_frontLeft = new TalonSwerve(0,1);
-  private final TalonSwerve m_frontRight = new TalonSwerve(0,1);
-  private final TalonSwerve m_backLeft = new TalonSwerve(0,1);
-  private final TalonSwerve m_backRight = new TalonSwerve(0,1);
+  private final TalonSwerve m_frontLeft = new TalonSwerve(9,0);
+  private final TalonSwerve m_frontRight = new TalonSwerve(7,3);
+  private final TalonSwerve m_backLeft = new TalonSwerve(8,2);
+  private final TalonSwerve m_backRight = new TalonSwerve(6,1);
 
   //private final AnalogGyro m_gyro = new AnalogGyro(0);
   private final AHRS navx = new AHRS(SPI.Port.kMXP);
