@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.kauailabs.navx.frc.AHRS;
 //import edu.wpi.first.wpilibj.AnalogGyro;
@@ -26,20 +27,21 @@ public class Drivetrain {
   // private final SwerveModule m_frontLeft = new SwerveModule(1, 2, 0, 1, 2, 3);
   // private final SwerveModule m_frontRight = new SwerveModule(3, 4, 4, 5, 6, 7);
   // private final SwerveModule m_backLeft = new SwerveModule(5, 6, 8, 9, 10, 11);
-  // private final SwerveModule m_backRight = new SwerveModule(7, 8, 12, 13, 14, 15);
+  // private final SwerveModule m_backRight = new SwerveModule(7, 8, 12, 13, 14,
+  // 15);
 
-  private final TalonSwerve m_frontLeft = new TalonSwerve(9,0);
-  private final TalonSwerve m_frontRight = new TalonSwerve(7,3);
-  private final TalonSwerve m_backLeft = new TalonSwerve(8,2);
-  private final TalonSwerve m_backRight = new TalonSwerve(6,1);
+  private final TalonSwerve m_frontLeft = new TalonSwerve(9, 0);
+  private final TalonSwerve m_frontRight = new TalonSwerve(7, 3);
+  private final TalonSwerve m_backLeft = new TalonSwerve(8, 2);
+  private final TalonSwerve m_backRight = new TalonSwerve(6, 1);
 
-  //private final AnalogGyro m_gyro = new AnalogGyro(0);
+  // private final AnalogGyro m_gyro = new AnalogGyro(0);
   private final AHRS navx = new AHRS(SPI.Port.kMXP);
 
   private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
-      m_frontLeftLocation, 
-      m_frontRightLocation, 
-      m_backLeftLocation, 
+      m_frontLeftLocation,
+      m_frontRightLocation,
+      m_backLeftLocation,
       m_backRightLocation);
 
   // private final SwerveDriveOdometry m_odometry = new
@@ -79,7 +81,7 @@ public class Drivetrain {
   }
 
   /** Updates the field relative position of the robot. */
- 
+
   public void updateOdometry() {
     m_odometry.update(
         navx.getRotation2d(),
@@ -87,5 +89,10 @@ public class Drivetrain {
         m_frontRight.getState(),
         m_backLeft.getState(),
         m_backRight.getState());
-  }
+
+        SmartDashboard.putString("FrontLeftAngle", m_frontLeft.getState().toString());
+        SmartDashboard.putString("FrontRightAngle", m_frontRight.getState().toString());
+        SmartDashboard.putString("BackLeftAngle", m_backLeft.getState().toString());
+        SmartDashboard.putString("BackRightAngle", m_backRight.getState().toString());
+   }
 }
