@@ -15,8 +15,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 //import edu.wpi.first.wpilibj.Encoder;
 
 public class TalonSwerve {
-    //private static final double kWheelRadius = 0.0508;
-    //private static final int kEncoderResolution = 4096;
+    private static final double kWheelRadius = 0.0508;
+    private static final int kEncoderResolution = 4096;
 
     private static final double kModuleMaxAngularVelocity = Drivetrain.kMaxAngularSpeed;
     private static final double kModuleMaxAngularAcceleration = 2 * Math.PI; // radians per second squared
@@ -28,11 +28,11 @@ public class TalonSwerve {
     // private Encoder m_turningEncoder;
 
     // Gains are for example purposes only - must be determined for your own robot!
-    private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
+    private final PIDController m_drivePIDController = new PIDController(.1, 0, 0);
 
     // Gains are for example purposes only - must be determined for your own robot!
     private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(
-            1,
+            .1,
             0,
             0,
             new TrapezoidProfile.Constraints(
@@ -49,12 +49,13 @@ public class TalonSwerve {
         // Set the distance per pulse for the drive encoder. We can simply use the
         // distance traveled for one rotation of the wheel divided by the encoder
         // resolution.
-        //m_driveEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+        // m_driveEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius /
+        // kEncoderResolution);
 
         // Set the distance (in this case, angle) per pulse for the turning encoder.
         // This is the the angle through an entire rotation (2 * pi) divided by the
         // encoder resolution.
-        //m_turningEncoder.setDistancePerPulse(2 * Math.PI / kEncoderResolution);
+        // m_turningEncoder.setDistancePerPulse(2 * Math.PI / kEncoderResolution);
 
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
@@ -64,14 +65,16 @@ public class TalonSwerve {
     public SwerveModuleState getState() {
         // return new SwerveModuleState(m_driveEncoder.getRate(), new
         // Rotation2d(m_turningEncoder.get()));
-        return new SwerveModuleState(driveMotor.getSelectedSensorVelocity(),
-                new Rotation2d(turningMotor.getSelectedSensorPosition()));
+        return new SwerveModuleState(driveMotor.getSelectedSensorVelocity() * 2 * Math.PI * kWheelRadius,
+                new Rotation2d(turningMotor.getSelectedSensorPosition() * 2 * Math.PI / kEncoderResolution));
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
         // Optimize the reference state to avoid spinning further than 90 degrees
-        //SwerveModuleState state = SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.get()));
-        SwerveModuleState state = SwerveModuleState.optimize(desiredState, new Rotation2d(turningMotor.getSensorCollection().getAnalogIn()));
+        // SwerveModuleState state = SwerveModuleState.optimize(desiredState, new
+        // Rotation2d(m_turningEncoder.get()));
+        SwerveModuleState state = SwerveModuleState.optimize(desiredState,
+                new Rotation2d(turningMotor.getSensorCollection().getAnalogIn()));
 
         // Calculate the drive output from the drive PID controller.
         // final double driveOutput =
