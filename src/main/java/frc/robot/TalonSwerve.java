@@ -17,7 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class TalonSwerve {
         private static final double kWheelRadius = 0.0508;
-        private static final int kEncoderResolution = 4096;
+        private static final int kLampreyEncoderResolution = 1024;
 
         private static final double kModuleMaxAngularVelocity = Drivetrain.kMaxAngularSpeed;
         private static final double kModuleMaxAngularAcceleration = 2 * Math.PI; // radians per second squared
@@ -35,7 +35,7 @@ public class TalonSwerve {
 
         // Gains are for example purposes only - must be determined for your own robot!
         private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(
-                        .1,
+                        1,
                         0,
                         0,
                         new TrapezoidProfile.Constraints(
@@ -70,23 +70,25 @@ public class TalonSwerve {
         public SwerveModuleState getState() {
                 // return new SwerveModuleState(m_driveEncoder.getRate(), new
                 // Rotation2d(m_turningEncoder.get()));
-                return new SwerveModuleState(driveMotor.getSelectedSensorVelocity() * 2 * Math.PI * kWheelRadius,
-                                new Rotation2d(turningMotor.getSelectedSensorPosition() * 2 * Math.PI
-                                                / kEncoderResolution));
+                return new SwerveModuleState(driveMotor.getSelectedSensorVelocity() / 2 * Math.PI * kWheelRadius,
+                                new Rotation2d(turningMotor.getSelectedSensorPosition() / kLampreyEncoderResolution * 2
+                                                * Math.PI));
         }
 
         public void setDesiredState(SwerveModuleState desiredState) {
                 // Optimize the reference state to avoid spinning further than 90 degrees
                 // SwerveModuleState state = SwerveModuleState.optimize(desiredState, new
                 // Rotation2d(m_turningEncoder.get()));
+                SmartDashboard.putString(Name + "desiredState", desiredState.angle.toString());
                 SwerveModuleState state = SwerveModuleState.optimize(desiredState,
-                                new Rotation2d(turningMotor.getSensorCollection().getAnalogIn()));
+                new Rotation2d(turningMotor.getSelectedSensorPosition() / kLampreyEncoderResolution * 2
+                * Math.PI));
 
                 // Calculate the drive output from the drive PID controller.
                 // final double driveOutput =
                 // m_drivePIDController.calculate(m_driveEncoder.getRate(),
                 // state.speedMetersPerSecond);
-                final double driveOutput = m_drivePIDController.calculate(driveMotor.getSelectedSensorPosition(),
+                final double driveOutput = m_drivePIDController.calculate(driveMotor.getSelectedSensorVelocity(),
                                 state.speedMetersPerSecond);
 
                 final double driveFeedforward = m_driveFeedforward.calculate(state.speedMetersPerSecond);
@@ -95,17 +97,30 @@ public class TalonSwerve {
                 // final double turnOutput =
                 // m_turningPIDController.calculate(m_turningEncoder.get(),
                 // state.angle.getRadians());
-                final double turnOutput = m_turningPIDController.calculate(turningMotor.getSelectedSensorPosition(),
-                                state.angle.getRadians());
+                final double turnOutput = m_turningPIDController
+                                .calculate(turningMotor.getSelectedSensorPosition() / kLampreyEncoderResolution * 2
+                                                * Math.PI, state.angle.getRadians());
 
                 final double turnFeedforward = m_turnFeedforward
                                 .calculate(m_turningPIDController.getSetpoint().velocity);
 
                 // m_driveMotor.setVoltage(driveOutput + driveFeedforward);
                 // m_turningMotor.setVoltage(turnOutput + turnFeedforward);
-                SmartDashboard.putNumber(Name+"Drive", driveOutput + driveFeedforward);
-                SmartDashboard.putNumber(Name+"Turn", turnOutput + turnFeedforward);
-                driveMotor.set(TalonFXControlMode.PercentOutput, driveOutput + driveFeedforward);
-                turningMotor.set(TalonSRXControlMode.PercentOutput, turnOutput + turnFeedforward);
+                SmartDashboard.putNumber(Name + "DriveOutput", driveOutput);
+                SmartDashboard.putNumber(Name + "TurnOutput", turnOutput);
+                SmartDashboard.putNumber(Name + "DriveFF", driveFeedforward);
+                SmartDashboard.putNumber(Name + "TurnFF", turnFeedforward);
+
+                double turnRadians = turningMotor.getSelectedSensorPosition() / kLampreyEncoderResolution * 2 * Math.PI;
+                //turningMotor.set(TalonSRXControlMode.PercentOutput, (state.angle.getRadians() - turnRadians) / 6.28);
+                turningMotor.set(TalonSRXControlMode.PercentOutput, (desiredState.angle.getRadians() - turnRadians) / 6.28);
+
+                SmartDashboard.putNumber(Name + "TurnRadians", turnRadians);
+                SmartDashboard.putNumber(Name + "TurnOrder", state.angle.getRadians());
+                SmartDashboard.putNumber(Name + "Turn%Output", (state.angle.getRadians() - turnRadians) / 6.28);
+
+                driveMotor.set(TalonFXControlMode.PercentOutput, state.speedMetersPerSecond / 3);
+                SmartDashboard.putNumber(Name + "Drive%Output", state.speedMetersPerSecond / 3);
+
         }
 }
