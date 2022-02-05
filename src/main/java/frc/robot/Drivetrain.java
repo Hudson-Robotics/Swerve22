@@ -30,10 +30,10 @@ public class Drivetrain {
   // private final SwerveModule m_backRight = new SwerveModule(7, 8, 12, 13, 14,
   // 15);
 
-  private final TalonSwerve m_frontLeft = new TalonSwerve(9, 0);
-  private final TalonSwerve m_frontRight = new TalonSwerve(7, 3);
-  private final TalonSwerve m_backLeft = new TalonSwerve(8, 2);
-  private final TalonSwerve m_backRight = new TalonSwerve(6, 1);
+  private final TalonSwerve m_frontLeft = new TalonSwerve(9, 0, "FrontLeft");
+  private final TalonSwerve m_frontRight = new TalonSwerve(7, 3, "FrontRight");
+  private final TalonSwerve m_backLeft = new TalonSwerve(8, 2, "BackLeft");
+  private final TalonSwerve m_backRight = new TalonSwerve(6, 1, "BackRight");
 
   // private final AnalogGyro m_gyro = new AnalogGyro(0);
   private final AHRS navx = new AHRS(SPI.Port.kMXP);
@@ -81,7 +81,7 @@ public class Drivetrain {
 
     SmartDashboard.putNumber("xSpeed", xSpeed);
     SmartDashboard.putNumber("ySpeed", ySpeed);
-    SmartDashboard.putNumber("rot",rot);
+    SmartDashboard.putNumber("rot", rot);
     SmartDashboard.putBoolean("fieldRelative", fieldRelative);
 
   }
