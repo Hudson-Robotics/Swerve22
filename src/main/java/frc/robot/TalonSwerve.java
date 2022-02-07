@@ -81,8 +81,10 @@ public class TalonSwerve {
                 // Rotation2d(m_turningEncoder.get()));
                 SmartDashboard.putString(Name + "desiredState", desiredState.angle.toString());
                 SwerveModuleState state = SwerveModuleState.optimize(desiredState,
-                new Rotation2d(turningMotor.getSelectedSensorPosition() / kLampreyEncoderResolution * 2
-                * Math.PI));
+                                new Rotation2d(turningMotor.getSelectedSensorPosition() / kLampreyEncoderResolution * 2
+                                                * Math.PI));
+
+                SmartDashboard.putNumber(Name + "SSP", turningMotor.getSelectedSensorPosition());
 
                 // Calculate the drive output from the drive PID controller.
                 // final double driveOutput =
@@ -112,12 +114,16 @@ public class TalonSwerve {
                 SmartDashboard.putNumber(Name + "TurnFF", turnFeedforward);
 
                 double turnRadians = turningMotor.getSelectedSensorPosition() / kLampreyEncoderResolution * 2 * Math.PI;
-                //turningMotor.set(TalonSRXControlMode.PercentOutput, (state.angle.getRadians() - turnRadians) / 6.28);
-                turningMotor.set(TalonSRXControlMode.PercentOutput, (desiredState.angle.getRadians() - turnRadians) / 6.28);
+                // turningMotor.set(TalonSRXControlMode.PercentOutput, (state.angle.getRadians()
+                // - turnRadians) / 6.28);
+                // turningMotor.set(TalonSRXControlMode.PercentOutput,
+                //                 (desiredState.angle.getRadians() - turnRadians) / 2);
+                turningMotor.set(TalonSRXControlMode.PercentOutput,
+                                (state.angle.getRadians()- turnRadians) / 2);
 
                 SmartDashboard.putNumber(Name + "TurnRadians", turnRadians);
                 SmartDashboard.putNumber(Name + "TurnOrder", state.angle.getRadians());
-                SmartDashboard.putNumber(Name + "Turn%Output", (state.angle.getRadians() - turnRadians) / 6.28);
+                SmartDashboard.putNumber(Name + "Turn%Output", (state.angle.getRadians() - turnRadians) / 2);
 
                 driveMotor.set(TalonFXControlMode.PercentOutput, state.speedMetersPerSecond / 3);
                 SmartDashboard.putNumber(Name + "Drive%Output", state.speedMetersPerSecond / 3);
