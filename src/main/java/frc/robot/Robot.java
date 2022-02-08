@@ -37,6 +37,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    if(m_controller.getLeftBumper()&&m_controller.getRightBumper()){
+      m_swerve.Reset();
+    }
     driveWithJoystick(true);
     m_swerve.updateOdometry();
 

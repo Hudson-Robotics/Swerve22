@@ -50,6 +50,10 @@ public class Drivetrain {
 
   public Drivetrain() {
     // m_gyro.reset();
+    Reset();
+  }
+
+  public void Reset(){
     navx.reset();
   }
 
