@@ -17,19 +17,22 @@ public class Robot extends TimedRobot {
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(2);
 
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+  }
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+  }
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+  }
 
   @Override
   public void autonomousPeriodic() {
     driveWithJoystick(false);
     m_swerve.updateOdometry();
-    }
+  }
 
   @Override
   public void teleopInit() {
@@ -37,7 +40,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    if(m_controller.getLeftBumper()&&m_controller.getRightBumper()){
+    if (m_controller.getLeftBumperPressed() && m_controller.getRightBumperPressed()) {
       m_swerve.Reset();
     }
     driveWithJoystick(true);
