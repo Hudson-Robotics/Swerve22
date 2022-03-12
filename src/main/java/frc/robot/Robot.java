@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -21,6 +22,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 
 public class Robot extends TimedRobot {
@@ -58,13 +60,15 @@ public class Robot extends TimedRobot {
   private final DigitalInput lsClimbLeft = new DigitalInput(1);
   private final DigitalInput lsClimbRight = new DigitalInput(2);
 
+  private int proximity;
+
   @Override
   public void robotInit() {
   }
 
   @Override
   public void robotPeriodic() {
-    int proximity = m_colorSensor.getProximity();
+    proximity = m_colorSensor.getProximity();
     double IR = m_colorSensor.getIR();
     Color detectedColor = m_colorSensor.getColor();
 
@@ -96,7 +100,11 @@ public class Robot extends TimedRobot {
     if (m_controller.getLeftBumperPressed() && m_controller.getRightBumperPressed()) {
       m_swerve.Reset();
     }
+
     driveWithJoystick(true);
+    intake();
+    index();
+    shoot();
 
   }
 
@@ -128,5 +136,90 @@ public class Robot extends TimedRobot {
         * Drivetrain.kMaxAngularSpeed;
 
     m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+  }
+
+  private void intake() {
+    double leftTrigger = m_controller.getLeftTriggerAxis();
+    double rightTrigger = m_controller.getRightTriggerAxis();
+    boolean leftTriggerPressed;
+    boolean rightTriggerPressed;
+
+    if (leftTrigger > .5) {
+      leftTriggerPressed = true;
+    } else {
+      leftTriggerPressed = false;
+    }
+
+    if (rightTrigger > .5) {
+      rightTriggerPressed = true;
+    } else {
+      rightTriggerPressed = false;
+    }
+
+    if (leftTriggerPressed || rightTriggerPressed) {
+      intake.set(ControlMode.PercentOutput, .3);
+    } else {
+      intake.set(ControlMode.PercentOutput, 0);
+      intLeftCylinders.set(Value.kOff);
+      intRightCylinders.set(Value.kOff);
+    }
+
+    if (leftTriggerPressed) {
+      intLeftCylinders.set(Value.kForward);
+      intRightCylinders.set(Value.kForward);
+    }
+    if (rightTriggerPressed) {
+      intLeftCylinders.set(Value.kReverse);
+      intRightCylinders.set(Value.kReverse);
+    }
+
+  }
+
+  private void index() {
+    boolean aButton = m_controller.getAButton();
+    boolean bButton = m_controller.getBButton();
+    boolean xButton = m_controller.getXButton();
+    boolean prox;
+
+    if (proximity >= 200) {
+      prox = true;
+    } else {
+      prox = false;
+    }
+
+    if (!aButton & xButton) {
+      indexTop.set(-.3);
+      indexBottom.set(-.3);
+    } else if (aButton & !prox) {
+      indexTop.set(.3);
+      indexBottom.set(.3);
+    } else if (bButton) {
+      indexTop.set(.3);
+      indexBottom.set(.3);
+    } else {
+      indexTop.set(0);
+      indexBottom.set(0);
+    }
+
+  }
+
+  private boolean shooterRun;
+
+  private void shoot() {
+    boolean rightBumper = m_controller.getRightBumper();
+    boolean lefttBumper = m_controller.getLeftBumper();
+    boolean yButtonPress = m_controller.getYButtonPressed();
+
+    if (rightBumper & !lsShooterHome.get()) {
+      shooterAngle.set(-.1);
+    } else if (lefttBumper) {
+      shooterAngle.set(.1);
+    } else {
+      shooterAngle.set(0);
+    }
+
+    if (yButtonPress) {
+
+    }
   }
 }
