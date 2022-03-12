@@ -121,7 +121,7 @@ public class Robot extends TimedRobot {
     intake();
     index();
     shoot();
-
+    climb();
   }
 
   @Override
@@ -271,4 +271,53 @@ public class Robot extends TimedRobot {
     }
 
   }
+
+  private void climb() {
+    int pov = m_controller.getPOV();
+    PovAngle povAngle;
+
+    if (pov == 0) {
+      povAngle = PovAngle.Up;
+    } else if (pov == 90) {
+      povAngle = PovAngle.Right;
+    } else if (pov == 180) {
+      povAngle = PovAngle.Down;
+    } else if (pov == 270) {
+      povAngle = PovAngle.Left;
+    } else {
+      povAngle = PovAngle.Bad;
+    }
+
+    switch (povAngle) {
+      case Up:
+        climbLeft.set(.3);
+        climbRight.set(.3);
+        break;
+      case Down:
+        climbLeft.set(-.3);
+        climbRight.set(-.3);
+        break;
+      case Left:
+        climbCylinders.set(Value.kForward);
+        break;
+      case Right:
+        climbCylinders.set(Value.kForward);
+        break;
+      default:
+        climbLeft.set(0);
+        climbRight.set(0);
+        climbCylinders.set(Value.kOff);
+        break;
+    }
+
+  }
+
+  private enum PovAngle {
+    Up,
+    Down,
+    Left,
+    Right,
+    Bad
+  }
+
 }
