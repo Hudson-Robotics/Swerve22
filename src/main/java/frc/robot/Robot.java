@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.I2C;
@@ -12,22 +13,30 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.ColorMatchResult;
+import com.revrobotics.ColorMatch;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.ControlMode;
+//import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 
 public class Robot extends TimedRobot {
+  private Alliance alliance;
+
   private final I2C.Port i2cPort = I2C.Port.kOnboard;
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
+  private final ColorMatch m_colorMatcher = new ColorMatch();
+  private final Color kBlueBall = new Color(0.17, 0.41, 0.41);
+  private final Color kRedBall = new Color(0.51, 0.35, 0.15);
 
   private final XboxController m_controller = new XboxController(0);
   private final Drivetrain m_swerve = new Drivetrain();
@@ -61,16 +70,20 @@ public class Robot extends TimedRobot {
   private final DigitalInput lsClimbRight = new DigitalInput(2);
 
   private int proximity;
+  private Color detectedColor;
 
   @Override
   public void robotInit() {
+    m_colorMatcher.addColorMatch(kBlueBall);
+    m_colorMatcher.addColorMatch(kRedBall);
   }
 
   @Override
   public void robotPeriodic() {
+    alliance = DriverStation.getAlliance();
     proximity = m_colorSensor.getProximity();
     double IR = m_colorSensor.getIR();
-    Color detectedColor = m_colorSensor.getColor();
+    detectedColor = m_colorSensor.getColor();
 
     SmartDashboard.putNumber("Proximity", proximity);
 
@@ -78,6 +91,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Green", detectedColor.green);
     SmartDashboard.putNumber("Blue", detectedColor.blue);
     SmartDashboard.putNumber("IR", IR);
+    SmartDashboard.putNumber("PT High", ptHigh);
+    SmartDashboard.putNumber("PT Work", ptWork);
+    SmartDashboard.putNumber("Air Comp Amps", compCurrent);
 
     m_swerve.updateOdometry();
   }
@@ -157,9 +173,9 @@ public class Robot extends TimedRobot {
     }
 
     if (leftTriggerPressed || rightTriggerPressed) {
-      intake.set(ControlMode.PercentOutput, .3);
+      intake.set(TalonSRXControlMode.PercentOutput, .3);
     } else {
-      intake.set(ControlMode.PercentOutput, 0);
+      intake.set(TalonSRXControlMode.PercentOutput, 0);
       intLeftCylinders.set(Value.kOff);
       intRightCylinders.set(Value.kOff);
     }
@@ -193,7 +209,7 @@ public class Robot extends TimedRobot {
     } else if (aButton & !prox) {
       indexTop.set(.3);
       indexBottom.set(.3);
-    } else if (bButton) {
+    } else if (bButton & shooterRun) {
       indexTop.set(.3);
       indexBottom.set(.3);
     } else {
@@ -218,8 +234,41 @@ public class Robot extends TimedRobot {
       shooterAngle.set(0);
     }
 
-    if (yButtonPress) {
+    String colorString;
+    Boolean colorAccept = false;
+    ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
 
+    if (match.color == kBlueBall) {
+      colorString = "Blue";
+      if (alliance == Alliance.Blue) {
+        colorAccept = true;
+      }
+    } else if (match.color == kRedBall) {
+      colorString = "Red";
+      if (alliance == Alliance.Red) {
+        colorAccept = true;
+      }
+    } else {
+      colorString = "Unknown";
     }
+
+    SmartDashboard.putNumber("Confidence", match.confidence);
+    SmartDashboard.putString("Color Detected", colorString);
+
+    if (yButtonPress) {
+      shooterRun = !shooterRun;
+    }
+
+    if (shooterRun) {
+      if (colorAccept) {
+        shooter.set(TalonFXControlMode.PercentOutput, .3);
+      } else {
+        shooter.set(TalonFXControlMode.PercentOutput, .1);
+      }
+
+    } else {
+      shooter.set(TalonFXControlMode.PercentOutput, 0);
+    }
+
   }
 }
