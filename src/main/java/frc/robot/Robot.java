@@ -42,9 +42,9 @@ public class Robot extends TimedRobot {
   private final Drivetrain m_swerve = new Drivetrain();
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(2);
-  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(2);
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(2);
+  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(1);
+  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(1);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(1);
 
   private final CANSparkMax climbLeft = new CANSparkMax(14, MotorType.kBrushless);
   private final CANSparkMax climbRight = new CANSparkMax(9, MotorType.kBrushless);
@@ -112,10 +112,10 @@ public class Robot extends TimedRobot {
     if (timer.get() < 2) {
       shooter.set(TalonFXControlMode.PercentOutput, -.7);
     } else if (timer.get() < 5) {
-      indexTop.set(.3);
-      indexBottom.set(-.3);
-    } else if (timer.get() < 10) {
-      var xSpeed = -.3 * Drivetrain.kMaxSpeed;
+      indexTop.set(-.3);
+      indexBottom.set(.3);
+    } else if (timer.get() < 8) {
+      var xSpeed = .3 * Drivetrain.kMaxSpeed;
       m_swerve.drive(xSpeed, 0, 0, false);
     } else {
       shooter.set(TalonFXControlMode.PercentOutput, 0);
@@ -153,20 +153,20 @@ public class Robot extends TimedRobot {
   private void driveWithJoystick(boolean fieldRelative) {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    final var xSpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getLeftY(), 0.05))
+    final var xSpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(-m_controller.getLeftY(), 0.05))
         * Drivetrain.kMaxSpeed;
 
     // Get the y speed or sideways/strafe speed. We are inverting this because
     // we want a positive value when we pull to the left. Xbox controllers
     // return positive values when you pull to the right by default.
-    final var ySpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getLeftX(), 0.05))
+    final var ySpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(-m_controller.getLeftX(), 0.05))
         * Drivetrain.kMaxSpeed;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    final var rot = -m_rotLimiter.calculate(MathUtil.applyDeadband(m_controller.getRightX(), 0.05))
+    final var rot = -m_rotLimiter.calculate(MathUtil.applyDeadband(-m_controller.getRightX(), 0.05))
         * Drivetrain.kMaxAngularSpeed;
 
     m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
@@ -280,7 +280,7 @@ public class Robot extends TimedRobot {
     Boolean colorAccept = false;
     ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
 
-    if (proximity >= 200) {
+   // if (proximity >= 200) {
       if (match.color == kBlueBall) {
         colorString = "Blue";
         if (alliance == Alliance.Blue) {
@@ -292,7 +292,7 @@ public class Robot extends TimedRobot {
           colorAccept = true;
         }
       }
-    }
+    //}
 
     SmartDashboard.putNumber("Confidence", match.confidence);
     SmartDashboard.putString("Color Detected", colorString);
@@ -308,7 +308,7 @@ public class Robot extends TimedRobot {
       if (colorAccept) {
         shooter.set(TalonFXControlMode.PercentOutput, -.7);
       } else {
-        shooter.set(TalonFXControlMode.PercentOutput, -.1);
+        shooter.set(TalonFXControlMode.PercentOutput, -.25);
       }
 
     } else {
@@ -335,15 +335,15 @@ public class Robot extends TimedRobot {
 
     switch (povAngle) {
       case Up:
-        climbLeft.set(-.3);
-        climbRight.set(.3);
+        climbLeft.set(-.6);
+        climbRight.set(.6);
         break;
       case Down:
         // if (!lsClimbLeft.get()) {
-        climbLeft.set(.3);
+        climbLeft.set(.6);
         // }
         // if (!lsClimbRight.get()) {
-        climbRight.set(-.3);
+        climbRight.set(-.6);
         // }
         if (lsClimbLeft.get() & lsClimbRight.get()) {
           // m_controller.setRumble(RumbleType.kLeftRumble, 1);
