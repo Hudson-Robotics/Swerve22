@@ -276,22 +276,22 @@ public class Robot extends TimedRobot {
       m_controller.setRumble(RumbleType.kRightRumble, 0);
     }
 
-    String colorString;
+    String colorString = "Unknown";
     Boolean colorAccept = false;
     ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
 
-    if (match.color == kBlueBall) {
-      colorString = "Blue";
-      if (alliance == Alliance.Blue) {
-        colorAccept = true;
+    if (proximity >= 200) {
+      if (match.color == kBlueBall) {
+        colorString = "Blue";
+        if (alliance == Alliance.Blue) {
+          colorAccept = true;
+        }
+      } else if (match.color == kRedBall) {
+        colorString = "Red";
+        if (alliance == Alliance.Red) {
+          colorAccept = true;
+        }
       }
-    } else if (match.color == kRedBall) {
-      colorString = "Red";
-      if (alliance == Alliance.Red) {
-        colorAccept = true;
-      }
-    } else {
-      colorString = "Unknown";
     }
 
     SmartDashboard.putNumber("Confidence", match.confidence);
@@ -306,7 +306,7 @@ public class Robot extends TimedRobot {
 
     if (shooterRun) {
       if (colorAccept) {
-        shooter.set(TalonFXControlMode.PercentOutput, -.5);
+        shooter.set(TalonFXControlMode.PercentOutput, -.7);
       } else {
         shooter.set(TalonFXControlMode.PercentOutput, -.1);
       }
