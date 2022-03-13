@@ -1,33 +1,33 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-
-import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import com.revrobotics.ColorSensorV3;
-import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorMatchResult;
+import com.revrobotics.ColorSensorV3;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.Timer;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-//import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.PneumaticHub;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 
 public class Robot extends TimedRobot {
   private Alliance alliance;
@@ -49,8 +49,8 @@ public class Robot extends TimedRobot {
   private final CANSparkMax climbLeft = new CANSparkMax(14, MotorType.kBrushless);
   private final CANSparkMax climbRight = new CANSparkMax(9, MotorType.kBrushless);
 
-  private final CANSparkMax indexTop = new CANSparkMax(11, MotorType.kBrushless);
-  private final CANSparkMax indexBottom = new CANSparkMax(10, MotorType.kBrushless);
+  private final CANSparkMax indexTop = new CANSparkMax(10, MotorType.kBrushless);
+  private final CANSparkMax indexBottom = new CANSparkMax(11, MotorType.kBrushless);
 
   private final CANSparkMax shooterAngle = new CANSparkMax(5, MotorType.kBrushless);
   private final TalonFX shooter = new TalonFX(3);
@@ -60,7 +60,7 @@ public class Robot extends TimedRobot {
   private final PneumaticHub PnueHub = new PneumaticHub(22);
   private final DoubleSolenoid climbCylinders = PnueHub.makeDoubleSolenoid(0, 1);
   private final DoubleSolenoid intLeftCylinders = PnueHub.makeDoubleSolenoid(2, 3);
-  private final DoubleSolenoid intRightCylinders = PnueHub.makeDoubleSolenoid(4, 5);
+  private final DoubleSolenoid intRightCylinders = PnueHub.makeDoubleSolenoid(6, 7);
   private final double ptHigh = PnueHub.getPressure(0);
   private final double ptWork = PnueHub.getPressure(1);
   private final double compCurrent = PnueHub.getCompressorCurrent();
@@ -71,6 +71,8 @@ public class Robot extends TimedRobot {
 
   private int proximity;
   private Color detectedColor;
+
+  private Timer timer = new Timer();
 
   @Override
   public void robotInit() {
@@ -100,11 +102,27 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    timer.reset();
+    timer.start();
   }
 
   @Override
   public void autonomousPeriodic() {
-    driveWithJoystick(false);
+    // driveWithJoystick(false);
+    if (timer.get() < 2) {
+      shooter.set(TalonFXControlMode.PercentOutput, -.7);
+    } else if (timer.get() < 5) {
+      indexTop.set(.3);
+      indexBottom.set(-.3);
+    } else if (timer.get() < 10) {
+      var xSpeed = -.3 * Drivetrain.kMaxSpeed;
+      m_swerve.drive(xSpeed, 0, 0, false);
+    } else {
+      shooter.set(TalonFXControlMode.PercentOutput, 0);
+      indexTop.set(0);
+      indexBottom.set(0);
+      m_swerve.drive(0, 0, 0, false);
+    }
   }
 
   @Override
@@ -172,21 +190,30 @@ public class Robot extends TimedRobot {
       rightTriggerPressed = false;
     }
 
+    SmartDashboard.putBoolean("Left Trigger Bool", leftTriggerPressed);
+    SmartDashboard.putNumber("Left Trigger Position", leftTrigger);
+    SmartDashboard.putBoolean("Right Trigger Bool", rightTriggerPressed);
+    SmartDashboard.putNumber("Right Trigger Position", rightTrigger);
+
     if (leftTriggerPressed || rightTriggerPressed) {
-      intake.set(TalonSRXControlMode.PercentOutput, .3);
+      intake.set(TalonSRXControlMode.PercentOutput, -.7);
     } else {
       intake.set(TalonSRXControlMode.PercentOutput, 0);
       intLeftCylinders.set(Value.kOff);
       intRightCylinders.set(Value.kOff);
-    }
+      // m_controller.setRumble(RumbleType.kLeftRumble, 0);
+      // m_controller.setRumble(RumbleType.kRightRumble, 0);
 
+    }
     if (leftTriggerPressed) {
       intLeftCylinders.set(Value.kForward);
       intRightCylinders.set(Value.kForward);
+      m_controller.setRumble(RumbleType.kLeftRumble, 1.0);
     }
     if (rightTriggerPressed) {
       intLeftCylinders.set(Value.kReverse);
       intRightCylinders.set(Value.kReverse);
+      m_controller.setRumble(RumbleType.kRightRumble, 1.0);
     }
 
   }
@@ -203,14 +230,19 @@ public class Robot extends TimedRobot {
       prox = false;
     }
 
+    SmartDashboard.putBoolean("A Button", aButton);
+    SmartDashboard.putBoolean("B Button", bButton);
+    SmartDashboard.putBoolean("X Button", xButton);
+    SmartDashboard.putBoolean("Prox", prox);
+
     if (!aButton & xButton) {
-      indexTop.set(-.3);
+      indexTop.set(.3);
       indexBottom.set(-.3);
     } else if (aButton & !prox) {
-      indexTop.set(.3);
+      indexTop.set(-.3);
       indexBottom.set(.3);
     } else if (bButton & shooterRun) {
-      indexTop.set(.3);
+      indexTop.set(-.3);
       indexBottom.set(.3);
     } else {
       indexTop.set(0);
@@ -226,12 +258,22 @@ public class Robot extends TimedRobot {
     boolean lefttBumper = m_controller.getLeftBumper();
     boolean yButtonPress = m_controller.getYButtonPressed();
 
-    if (rightBumper & !lsShooterHome.get()) {
+    SmartDashboard.putBoolean("Right Bumper", rightBumper);
+    SmartDashboard.putBoolean("Left Bumper", lefttBumper);
+    SmartDashboard.putBoolean("Y Button", yButtonPress);
+
+    if (rightBumper & lsShooterHome.get()) {
       shooterAngle.set(-.1);
+    } else if (rightBumper & lsShooterHome.get()) {
+      shooterAngle.set(0);
+      m_controller.setRumble(RumbleType.kLeftRumble, 1);
+      m_controller.setRumble(RumbleType.kRightRumble, 1);
     } else if (lefttBumper) {
       shooterAngle.set(.1);
     } else {
       shooterAngle.set(0);
+      m_controller.setRumble(RumbleType.kLeftRumble, 0);
+      m_controller.setRumble(RumbleType.kRightRumble, 0);
     }
 
     String colorString;
@@ -254,16 +296,19 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Confidence", match.confidence);
     SmartDashboard.putString("Color Detected", colorString);
+    SmartDashboard.putString("Alliance", alliance.toString());
 
     if (yButtonPress) {
       shooterRun = !shooterRun;
     }
 
+    SmartDashboard.putBoolean("Shooter Run", shooterRun);
+
     if (shooterRun) {
       if (colorAccept) {
-        shooter.set(TalonFXControlMode.PercentOutput, .3);
+        shooter.set(TalonFXControlMode.PercentOutput, -.5);
       } else {
-        shooter.set(TalonFXControlMode.PercentOutput, .1);
+        shooter.set(TalonFXControlMode.PercentOutput, -.1);
       }
 
     } else {
@@ -290,23 +335,33 @@ public class Robot extends TimedRobot {
 
     switch (povAngle) {
       case Up:
-        climbLeft.set(.3);
+        climbLeft.set(-.3);
         climbRight.set(.3);
         break;
       case Down:
-        climbLeft.set(-.3);
+        // if (!lsClimbLeft.get()) {
+        climbLeft.set(.3);
+        // }
+        // if (!lsClimbRight.get()) {
         climbRight.set(-.3);
+        // }
+        if (lsClimbLeft.get() & lsClimbRight.get()) {
+          // m_controller.setRumble(RumbleType.kLeftRumble, 1);
+          // m_controller.setRumble(RumbleType.kRightRumble, 1);
+        }
         break;
       case Left:
         climbCylinders.set(Value.kForward);
         break;
       case Right:
-        climbCylinders.set(Value.kForward);
+        climbCylinders.set(Value.kReverse);
         break;
       default:
         climbLeft.set(0);
         climbRight.set(0);
         climbCylinders.set(Value.kOff);
+        // m_controller.setRumble(RumbleType.kLeftRumble, 0);
+        // m_controller.setRumble(RumbleType.kRightRumble, 0);
         break;
     }
 

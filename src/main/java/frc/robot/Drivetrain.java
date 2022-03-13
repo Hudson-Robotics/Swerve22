@@ -18,7 +18,7 @@ public class Drivetrain {
   private final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
   private final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
 
-  private final TalonSwerve m_frontLeft = new TalonSwerve(0, 6, "FrontLeft");
+  private final TalonSwerve m_frontLeft = new TalonSwerve(20, 6, "FrontLeft");
   private final TalonSwerve m_frontRight = new TalonSwerve(16, 8, "FrontRight");
   private final TalonSwerve m_backLeft = new TalonSwerve(17, 7, "BackLeft");
   private final TalonSwerve m_backRight = new TalonSwerve(2, 12, "BackRight");

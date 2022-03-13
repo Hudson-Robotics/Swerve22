@@ -45,10 +45,10 @@ public class TalonSwerve {
                 driveMotor.set(TalonFXControlMode.PercentOutput, state.speedMetersPerSecond / 3);
 
                 SmartDashboard.putString(Name + "desiredState", desiredState.angle.toString());
-                SmartDashboard.putNumber(Name + "TurnRadians", turnRadians);
-                SmartDashboard.putNumber(Name + "SSP", turningMotor.getSelectedSensorPosition());
-                SmartDashboard.putNumber(Name + "TurnOrder", state.angle.getRadians());
-                SmartDashboard.putNumber(Name + "Turn%Output", (state.angle.getRadians() - turnRadians) / 2);
-                SmartDashboard.putNumber(Name + "Drive%Output", state.speedMetersPerSecond / 3);
+              //  SmartDashboard.putNumber(Name + "TurnRadians", turnRadians);
+               // SmartDashboard.putNumber(Name + "SSP", turningMotor.getSelectedSensorPosition());
+              //  SmartDashboard.putNumber(Name + "TurnOrder", state.angle.getRadians());
+               // SmartDashboard.putNumber(Name + "Turn%Output", (state.angle.getRadians() - turnRadians) / 2);
+              //  SmartDashboard.putNumber(Name + "Drive%Output", state.speedMetersPerSecond / 3);
         }
 }
