@@ -29,6 +29,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 public class Robot extends TimedRobot {
   private Alliance alliance;
 
@@ -57,13 +61,18 @@ public class Robot extends TimedRobot {
 
   private final TalonSRX intake = new TalonSRX(13);
 
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+  NetworkTableEntry tx = table.getEntry("tx");
+  NetworkTableEntry ty = table.getEntry("ty");
+  NetworkTableEntry ta = table.getEntry("ta");
+
   private final PneumaticHub PnueHub = new PneumaticHub(22);
   private final DoubleSolenoid climbCylinders = PnueHub.makeDoubleSolenoid(0, 1);
   private final DoubleSolenoid intLeftCylinders = PnueHub.makeDoubleSolenoid(2, 3);
   private final DoubleSolenoid intRightCylinders = PnueHub.makeDoubleSolenoid(6, 7);
-  private final double ptHigh = PnueHub.getPressure(0);
-  private final double ptWork = PnueHub.getPressure(1);
-  private final double compCurrent = PnueHub.getCompressorCurrent();
+  private double ptHigh;
+  private double ptWork;
+  private double compCurrent;
 
   private final DigitalInput lsShooterHome = new DigitalInput(0);
   private final DigitalInput lsClimbLeft = new DigitalInput(1);
@@ -87,6 +96,10 @@ public class Robot extends TimedRobot {
     double IR = m_colorSensor.getIR();
     detectedColor = m_colorSensor.getColor();
 
+    ptHigh = PnueHub.getPressure(0);
+    ptWork = PnueHub.getPressure(1);
+    compCurrent = PnueHub.getCompressorCurrent();
+
     SmartDashboard.putNumber("Proximity", proximity);
 
     SmartDashboard.putNumber("Red", detectedColor.red);
@@ -96,6 +109,14 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("PT High", ptHigh);
     SmartDashboard.putNumber("PT Work", ptWork);
     SmartDashboard.putNumber("Air Comp Amps", compCurrent);
+
+    double x = tx.getDouble(0.0);
+    double y = ty.getDouble(0.0);
+    double area = ta.getDouble(0.0);
+
+    SmartDashboard.putNumber("LimelightX", x);
+    SmartDashboard.putNumber("LimelightY", y);
+    SmartDashboard.putNumber("LimelightArea", area);
 
     m_swerve.updateOdometry();
   }
@@ -135,22 +156,14 @@ public class Robot extends TimedRobot {
       m_swerve.Reset();
     }
 
-    driveWithJoystick(true);
+    // drive(true);
     intake();
     index();
     shoot();
     climb();
   }
 
-  @Override
-  public void disabledInit() {
-  }
-
-  @Override
-  public void disabledPeriodic() {
-  }
-
-  private void driveWithJoystick(boolean fieldRelative) {
+  private void drive(boolean fieldRelative) {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
     final var xSpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(-m_controller.getLeftY(), 0.05))
@@ -195,27 +208,18 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Right Trigger Bool", rightTriggerPressed);
     SmartDashboard.putNumber("Right Trigger Position", rightTrigger);
 
-    if (leftTriggerPressed || rightTriggerPressed) {
+    if (shooterRun) {
       intake.set(TalonSRXControlMode.PercentOutput, -.7);
+      intLeftCylinders.set(Value.kReverse);
+      intRightCylinders.set(Value.kReverse);
+    } else if (rightTriggerPressed) {
+      intLeftCylinders.set(Value.kForward);
+      intRightCylinders.set(Value.kForward);
     } else {
       intake.set(TalonSRXControlMode.PercentOutput, 0);
       intLeftCylinders.set(Value.kOff);
       intRightCylinders.set(Value.kOff);
-      // m_controller.setRumble(RumbleType.kLeftRumble, 0);
-      // m_controller.setRumble(RumbleType.kRightRumble, 0);
-
     }
-    if (leftTriggerPressed) {
-      intLeftCylinders.set(Value.kForward);
-      intRightCylinders.set(Value.kForward);
-      m_controller.setRumble(RumbleType.kLeftRumble, 1.0);
-    }
-    if (rightTriggerPressed) {
-      intLeftCylinders.set(Value.kReverse);
-      intRightCylinders.set(Value.kReverse);
-      m_controller.setRumble(RumbleType.kRightRumble, 1.0);
-    }
-
   }
 
   private void index() {
@@ -280,19 +284,19 @@ public class Robot extends TimedRobot {
     Boolean colorAccept = false;
     ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
 
-   // if (proximity >= 200) {
-      if (match.color == kBlueBall) {
-        colorString = "Blue";
-        if (alliance == Alliance.Blue) {
-          colorAccept = true;
-        }
-      } else if (match.color == kRedBall) {
-        colorString = "Red";
-        if (alliance == Alliance.Red) {
-          colorAccept = true;
-        }
+    // if (proximity >= 200) {
+    if (match.color == kBlueBall) {
+      colorString = "Blue";
+      if (alliance == Alliance.Blue) {
+        colorAccept = true;
       }
-    //}
+    } else if (match.color == kRedBall) {
+      colorString = "Red";
+      if (alliance == Alliance.Red) {
+        colorAccept = true;
+      }
+    }
+    // }
 
     SmartDashboard.putNumber("Confidence", match.confidence);
     SmartDashboard.putString("Color Detected", colorString);
