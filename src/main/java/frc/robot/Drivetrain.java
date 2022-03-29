@@ -32,8 +32,14 @@ public class Drivetrain {
 
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, navx.getRotation2d());
 
-  public Drivetrain() {
+  private static final Drivetrain instance = new Drivetrain();
+
+  private Drivetrain() {
     Reset();
+  }
+
+  public static Drivetrain getInstance() {
+    return instance;
   }
 
   public void Reset() {

@@ -15,13 +15,22 @@ public class Index {
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
     private int proximity = 0;
 
+    private static final Index instance = new Index();
+
+    private Index() {
+    }
+
+    public static Index getInstance() {
+        return instance;
+    }
+
     public void index(XboxController m_controller, boolean shooterRun) {
         boolean aButton = m_controller.getAButton();
         boolean bButton = m_controller.getBButton();
         boolean xButton = m_controller.getXButton();
         proximity = m_colorSensor.getProximity();
         boolean prox;
-       
+
         if (proximity >= 200) {
             prox = true;
         } else {

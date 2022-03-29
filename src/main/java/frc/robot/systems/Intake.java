@@ -15,6 +15,15 @@ public class Intake {
     private final DoubleSolenoid intLeftCylinders = PnueHub.makeDoubleSolenoid(2, 3);
     private final DoubleSolenoid intRightCylinders = PnueHub.makeDoubleSolenoid(6, 7);
 
+    private static final Intake instance = new Intake();
+
+    private Intake() {
+    }
+
+    public static Intake getInstance() {
+        return instance;
+    }
+
     public void intake(XboxController m_controller, boolean shooterRun) {
         double leftTrigger = m_controller.getLeftTriggerAxis();
         double rightTrigger = m_controller.getRightTriggerAxis();

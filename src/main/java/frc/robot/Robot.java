@@ -22,7 +22,6 @@ public class Robot extends TimedRobot {
   private Alliance alliance;
 
   private final XboxController m_controller = new XboxController(0);
-  private final Drivetrain m_swerve = new Drivetrain();
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(1);
@@ -31,11 +30,12 @@ public class Robot extends TimedRobot {
 
   private boolean shooterRun;
 
-  private final LimeLight limeLight = new LimeLight();
-  private final Shooter shooter = new Shooter();
-  private final Climber climber = new Climber();
-  private final Index index = new Index();
-  private final Intake intake = new Intake();
+  private final LimeLight limeLight = LimeLight.getInstance();
+  private final Shooter shooter = Shooter.getInstance();
+  private final Climber climber = Climber.getInstance();
+  private final Index index = Index.getInstance();
+  private final Intake intake = Intake.getInstance();
+  private final Drivetrain m_swerve = Drivetrain.getInstance();
 
   private final PneumaticHub PnueHub = new PneumaticHub(22);
 

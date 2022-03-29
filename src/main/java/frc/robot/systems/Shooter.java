@@ -27,10 +27,16 @@ public class Shooter {
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
     private int proximity;
 
-    public Shooter() {
+    private static final Shooter instance = new Shooter();
+
+    private Shooter() {
         super();
         m_colorMatcher.addColorMatch(kBlueBall);
         m_colorMatcher.addColorMatch(kRedBall);
+    }
+
+    public static Shooter getInstance() {
+        return instance;
     }
 
     public void shoot(XboxController m_controller, boolean shooterRun, boolean lsShooterHome, Alliance alliance) {

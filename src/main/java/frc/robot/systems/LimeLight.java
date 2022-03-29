@@ -13,6 +13,15 @@ public class LimeLight {
     NetworkTableEntry ty = table.getEntry("ty");
     NetworkTableEntry ta = table.getEntry("ta");
 
+    private static final LimeLight instance = new LimeLight();
+
+    private LimeLight() {
+    }
+
+    public static LimeLight getInstance() {
+        return instance;
+    }
+
     public void updateMeasurements() {
         double x = tx.getDouble(0.0);
         double y = ty.getDouble(0.0);

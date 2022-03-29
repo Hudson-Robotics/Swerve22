@@ -15,6 +15,15 @@ public class Climber {
     private final PneumaticHub PnueHub = new PneumaticHub(22);
     private final DoubleSolenoid climbCylinders = PnueHub.makeDoubleSolenoid(0, 1);
 
+    private final static Climber instance = new Climber();
+
+    private Climber() {
+    }
+
+    public static Climber getInstance() {
+        return instance;
+    }
+
     public void climb(XboxController m_controller, boolean lsClimbLeft, boolean lsClimbRight) {
         int pov = m_controller.getPOV();
         PovAngle povAngle;
