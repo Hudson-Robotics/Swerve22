@@ -14,7 +14,7 @@ public class Intake {
     private final PneumaticHub PnueHub = new PneumaticHub(22);
     private final DoubleSolenoid intLeftCylinders = PnueHub.makeDoubleSolenoid(2, 3);
     private final DoubleSolenoid intRightCylinders = PnueHub.makeDoubleSolenoid(6, 7);
-   
+
     public void intake(XboxController m_controller, boolean shooterRun) {
         double leftTrigger = m_controller.getLeftTriggerAxis();
         double rightTrigger = m_controller.getRightTriggerAxis();
@@ -38,13 +38,13 @@ public class Intake {
         SmartDashboard.putBoolean("Right Trigger Bool", rightTriggerPressed);
         SmartDashboard.putNumber("Right Trigger Position", rightTrigger);
 
-        if (shooterRun) {
+        if (shooterRun && !rightTriggerPressed) {
             intake.set(TalonSRXControlMode.PercentOutput, -.7);
-            intLeftCylinders.set(Value.kReverse);
-            intRightCylinders.set(Value.kReverse);
-        } else if (rightTriggerPressed) {
             intLeftCylinders.set(Value.kForward);
             intRightCylinders.set(Value.kForward);
+        } else if (shooterRun && rightTriggerPressed) {
+            intLeftCylinders.set(Value.kReverse);
+            intRightCylinders.set(Value.kReverse);
         } else {
             intake.set(TalonSRXControlMode.PercentOutput, 0);
             intLeftCylinders.set(Value.kOff);

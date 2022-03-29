@@ -6,7 +6,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import com.kauailabs.navx.frc.AHRS;
 
 public class Drivetrain {
@@ -78,7 +77,7 @@ public class Drivetrain {
         m_frontLeft.getState(), m_frontRight.getState(),
         m_backLeft.getState(), m_backRight.getState());
 
-    SmartDashboard.putString("NavX", navx.getRotation2d().toString());    
+    SmartDashboard.putString("NavX", navx.getRotation2d().toString());
     SmartDashboard.putString("FrontLeftAngle", m_frontLeft.getState().toString());
     SmartDashboard.putString("FrontRightAngle", m_frontRight.getState().toString());
     SmartDashboard.putString("BackLeftAngle", m_backLeft.getState().toString());

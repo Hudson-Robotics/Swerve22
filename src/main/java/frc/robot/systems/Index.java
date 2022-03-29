@@ -1,22 +1,27 @@
 package frc.robot.systems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.I2C;
 
 public class Index {
     private final CANSparkMax indexTop = new CANSparkMax(10, MotorType.kBrushless);
     private final CANSparkMax indexBottom = new CANSparkMax(11, MotorType.kBrushless);
+    private final I2C.Port i2cPort = I2C.Port.kOnboard;
+    private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
+    private int proximity = 0;
 
     public void index(XboxController m_controller, boolean shooterRun) {
         boolean aButton = m_controller.getAButton();
         boolean bButton = m_controller.getBButton();
         boolean xButton = m_controller.getXButton();
+        proximity = m_colorSensor.getProximity();
         boolean prox;
-        int proximity=100;
-
+       
         if (proximity >= 200) {
             prox = true;
         } else {

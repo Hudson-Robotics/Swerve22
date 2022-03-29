@@ -64,6 +64,7 @@ public class Robot extends TimedRobot {
     limeLight.updateMeasurements();
 
     m_swerve.updateOdometry();
+
   }
 
   @Override
@@ -99,34 +100,40 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+
     if (m_controller.getLeftBumperPressed() && m_controller.getRightBumperPressed()) {
       m_swerve.Reset();
     }
 
+    boolean yButtonPress = m_controller.getYButtonPressed();
+
+    if (yButtonPress) {
+      shooterRun = !shooterRun;
+    }
     drive(true);
     intake.intake(m_controller, shooterRun);
     index.index(m_controller, shooterRun);
-    shooter.shoot(shooterRun, lsShooterHome.get(), m_controller, alliance);
+    shooter.shoot(m_controller, shooterRun, lsShooterHome.get(), alliance);
     climber.climb(m_controller, lsClimbLeft.get(), lsClimbRight.get());
   }
 
   private void drive(boolean fieldRelative) {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    final var xSpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(-m_controller.getLeftY(), 0.05))
+    final var xSpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getLeftY(), 0.05))
         * Drivetrain.kMaxSpeed;
 
     // Get the y speed or sideways/strafe speed. We are inverting this because
     // we want a positive value when we pull to the left. Xbox controllers
     // return positive values when you pull to the right by default.
-    final var ySpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(-m_controller.getLeftX(), 0.05))
+    final var ySpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getLeftX(), 0.05))
         * Drivetrain.kMaxSpeed;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    final var rot = -m_rotLimiter.calculate(MathUtil.applyDeadband(-m_controller.getRightX(), 0.05))
+    final var rot = -m_rotLimiter.calculate(MathUtil.applyDeadband(m_controller.getRightX(), 0.05))
         * Drivetrain.kMaxAngularSpeed;
 
     m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);

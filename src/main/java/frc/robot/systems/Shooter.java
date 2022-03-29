@@ -26,36 +26,34 @@ public class Shooter {
     private final Color kRedBall = new Color(0.51, 0.35, 0.15);
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
     private int proximity;
-    
+
     public Shooter() {
         super();
         m_colorMatcher.addColorMatch(kBlueBall);
         m_colorMatcher.addColorMatch(kRedBall);
     }
 
-    public void shoot(boolean shooterRun, boolean lsShooterHome, XboxController m_controller, Alliance alliance) {
+    public void shoot(XboxController m_controller, boolean shooterRun, boolean lsShooterHome, Alliance alliance) {
         boolean rightBumper = m_controller.getRightBumper();
         boolean lefttBumper = m_controller.getLeftBumper();
-        boolean yButtonPress = m_controller.getYButtonPressed();
         proximity = m_colorSensor.getProximity();
         double IR = m_colorSensor.getIR();
         detectedColor = m_colorSensor.getColor();
         SmartDashboard.putNumber("Proximity", proximity);
-                SmartDashboard.putNumber("Red", detectedColor.red);
+        SmartDashboard.putNumber("Red", detectedColor.red);
         SmartDashboard.putNumber("Green", detectedColor.green);
         SmartDashboard.putNumber("Blue", detectedColor.blue);
         SmartDashboard.putNumber("IR", IR);
         SmartDashboard.putBoolean("Right Bumper", rightBumper);
         SmartDashboard.putBoolean("Left Bumper", lefttBumper);
-        SmartDashboard.putBoolean("Y Button", yButtonPress);
 
         if (rightBumper & lsShooterHome) {
             shooterAngle.set(-.1);
-        } else if (rightBumper & lsShooterHome) {
+        } else if (rightBumper & !lsShooterHome & !lefttBumper) {
             shooterAngle.set(0);
             m_controller.setRumble(RumbleType.kLeftRumble, 1);
             m_controller.setRumble(RumbleType.kRightRumble, 1);
-        } else if (lefttBumper) {
+        } else if (lefttBumper & !rightBumper) {
             shooterAngle.set(.1);
         } else {
             shooterAngle.set(0);
@@ -85,15 +83,11 @@ public class Shooter {
         SmartDashboard.putString("Color Detected", colorString);
         SmartDashboard.putString("Alliance", alliance.toString());
 
-        if (yButtonPress) {
-            shooterRun = !shooterRun;
-        }
-
         SmartDashboard.putBoolean("Shooter Run", shooterRun);
 
         if (shooterRun) {
             if (colorAccept) {
-                shooter.set(TalonFXControlMode.PercentOutput, -.7);
+                shooter.set(TalonFXControlMode.PercentOutput, -.4);
             } else {
                 shooter.set(TalonFXControlMode.PercentOutput, -.25);
             }
