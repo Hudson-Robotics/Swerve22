@@ -88,6 +88,10 @@ public class Drivetrain {
    */
   private void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
 
+    if (xboxCtrlr.getLeftBumperPressed() && xboxCtrlr.getRightBumperPressed()) {
+      Reset();
+    }
+
     var swerveModuleStates = m_kinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, navx.getRotation2d())

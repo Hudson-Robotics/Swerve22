@@ -67,15 +67,14 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    if (m_controller.getLeftBumperPressed() && m_controller.getRightBumperPressed()) {
-      swerve.Reset();
-    }
+  
 
     boolean yButtonPress = m_controller.getYButtonPressed();
 
     if (yButtonPress) {
       shooterRun = !shooterRun;
     }
+
     swerve.Drive(true);
     intake.intake(shooterRun);
     index.index(shooterRun);
