@@ -12,22 +12,14 @@ public class Index {
     private final CANSparkMax indexTop = new CANSparkMax(10, MotorType.kBrushless);
     private final CANSparkMax indexBottom = new CANSparkMax(11, MotorType.kBrushless);
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
+    private final XboxController xboxCtrlr = new XboxController(0);
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
     private int proximity = 0;
 
-    private static final Index instance = new Index();
-
-    private Index() {
-    }
-
-    public static Index getInstance() {
-        return instance;
-    }
-
-    public void index(XboxController m_controller, boolean shooterRun) {
-        boolean aButton = m_controller.getAButton();
-        boolean bButton = m_controller.getBButton();
-        boolean xButton = m_controller.getXButton();
+    public void index(boolean shooterRun) {
+        boolean aButton = xboxCtrlr.getAButton();
+        boolean bButton = xboxCtrlr.getBButton();
+        boolean xButton = xboxCtrlr.getXButton();
         proximity = m_colorSensor.getProximity();
         boolean prox;
 
@@ -43,18 +35,38 @@ public class Index {
         SmartDashboard.putBoolean("Prox", prox);
 
         if (!aButton & xButton) {
-            indexTop.set(.3);
-            indexBottom.set(-.3);
+            Reverse(.3);
         } else if (aButton & !prox) {
-            indexTop.set(-.3);
-            indexBottom.set(.3);
+            Forward(.3);
         } else if (bButton & shooterRun) {
-            indexTop.set(-.3);
-            indexBottom.set(.3);
+            Forward(.3);
         } else {
-            indexTop.set(0);
-            indexBottom.set(0);
+            Stop();
         }
 
+    }
+
+    public void Forward(double speed) {
+        indexTop.set(-speed);
+        indexBottom.set(speed);
+    }
+
+    public void Reverse(double speed) {
+        indexTop.set(speed);
+        indexBottom.set(-speed);
+    }
+
+    public void Stop() {
+        indexTop.set(0);
+        indexBottom.set(0);
+    }
+
+    private static final Index instance = new Index();
+
+    private Index() {
+    }
+
+    public static Index getInstance() {
+        return instance;
     }
 }

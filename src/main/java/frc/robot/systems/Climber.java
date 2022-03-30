@@ -7,25 +7,25 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Climber {
     private final CANSparkMax climbLeft = new CANSparkMax(14, MotorType.kBrushless);
     private final CANSparkMax climbRight = new CANSparkMax(9, MotorType.kBrushless);
-
+    
+    private final XboxController xboxCtrlr = new XboxController(0);
+  
     private final PneumaticHub PnueHub = new PneumaticHub(22);
     private final DoubleSolenoid climbCylinders = PnueHub.makeDoubleSolenoid(0, 1);
 
-    private final static Climber instance = new Climber();
+    private double currentLeftPosition;
+    private double currentRightPosition;
 
-    private Climber() {
-    }
+    public void climb() {
+        currentLeftPosition = climbLeft.getEncoder().getPosition();
+        currentRightPosition = climbRight.getEncoder().getPosition();
 
-    public static Climber getInstance() {
-        return instance;
-    }
-
-    public void climb(XboxController m_controller, boolean lsClimbLeft, boolean lsClimbRight) {
-        int pov = m_controller.getPOV();
+        int pov = xboxCtrlr.getPOV();
         PovAngle povAngle;
 
         if (pov == 0) {
@@ -42,19 +42,27 @@ public class Climber {
 
         switch (povAngle) {
             case Up:
-                climbLeft.set(-.6);
-                climbRight.set(.6);
+                if (currentLeftPosition > -540) {
+                    climbLeft.set(-1);
+                } else {
+                    climbLeft.set(0);
+                }
+                if (currentRightPosition < 540) {
+                    climbRight.set(1);
+                } else {
+                    climbRight.set(0);
+                }
                 break;
             case Down:
-                // if (!lsClimbLeft.get()) {
-                climbLeft.set(.6);
-                // }
-                // if (!lsClimbRight.get()) {
-                climbRight.set(-.6);
-                // }
-                if (lsClimbLeft & lsClimbRight) {
-                    // m_controller.setRumble(RumbleType.kLeftRumble, 1);
-                    // m_controller.setRumble(RumbleType.kRightRumble, 1);
+                if (currentLeftPosition < 0) {
+                    climbLeft.set(.6);
+                } else {
+                    climbLeft.set(0);
+                }
+                if (currentRightPosition > 0) {
+                    climbRight.set(-.6);
+                } else {
+                    climbRight.set(0);
                 }
                 break;
             case Left:
@@ -67,11 +75,25 @@ public class Climber {
                 climbLeft.set(0);
                 climbRight.set(0);
                 climbCylinders.set(Value.kOff);
-                // m_controller.setRumble(RumbleType.kLeftRumble, 0);
-                // m_controller.setRumble(RumbleType.kRightRumble, 0);
                 break;
         }
 
+        if (xboxCtrlr.getBackButton()) {
+            climbLeft.set(.3);
+        }
+        if (xboxCtrlr.getStartButton()) {
+            climbRight.set(-.3);
+        }
+    }
+
+    public void resetEncoders() {
+        climbLeft.getEncoder().setPosition(0);
+        climbRight.getEncoder().setPosition(0);
+    }
+
+    public void updateMeasurements() {
+        SmartDashboard.putNumber("Encoder Left Arm", currentLeftPosition);
+        SmartDashboard.putNumber("Encoder Right Arm", currentRightPosition);
     }
 
     private enum PovAngle {
@@ -80,5 +102,14 @@ public class Climber {
         Left,
         Right,
         Bad
+    }
+
+    private Climber() {
+    }
+
+    private final static Climber instance = new Climber();
+
+    public static Climber getInstance() {
+        return instance;
     }
 }

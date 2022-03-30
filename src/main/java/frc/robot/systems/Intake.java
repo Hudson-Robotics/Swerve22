@@ -11,22 +11,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake {
     private final TalonSRX intake = new TalonSRX(13);
+
+    private final XboxController xboxCtrlr = new XboxController(0);
+
     private final PneumaticHub PnueHub = new PneumaticHub(22);
     private final DoubleSolenoid intLeftCylinders = PnueHub.makeDoubleSolenoid(2, 3);
     private final DoubleSolenoid intRightCylinders = PnueHub.makeDoubleSolenoid(6, 7);
 
-    private static final Intake instance = new Intake();
-
-    private Intake() {
-    }
-
-    public static Intake getInstance() {
-        return instance;
-    }
-
-    public void intake(XboxController m_controller, boolean shooterRun) {
-        double leftTrigger = m_controller.getLeftTriggerAxis();
-        double rightTrigger = m_controller.getRightTriggerAxis();
+    public void intake(boolean shooterRun) {
+        double leftTrigger = xboxCtrlr.getLeftTriggerAxis();
+        double rightTrigger = xboxCtrlr.getRightTriggerAxis();
         boolean leftTriggerPressed;
         boolean rightTriggerPressed;
 
@@ -59,5 +53,14 @@ public class Intake {
             intLeftCylinders.set(Value.kOff);
             intRightCylinders.set(Value.kOff);
         }
+    }
+
+    private static final Intake instance = new Intake();
+
+    private Intake() {
+    }
+
+    public static Intake getInstance() {
+        return instance;
     }
 }
