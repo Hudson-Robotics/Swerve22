@@ -8,14 +8,14 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
-import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import frc.robot.systems.Climber;
 import frc.robot.systems.Index;
 import frc.robot.systems.Intake;
 import frc.robot.systems.LimeLight;
+import frc.robot.systems.PneuHub;
 import frc.robot.systems.Shooter;
 import frc.robot.systems.DriveTrain.Drivetrain;
 
@@ -37,12 +37,7 @@ public class Robot extends TimedRobot {
   private final Index index = Index.getInstance();
   private final Intake intake = Intake.getInstance();
   private final Drivetrain m_swerve = Drivetrain.getInstance();
-
-  private final PneumaticHub PnueHub = new PneumaticHub(22);
-
-  private double ptHigh;
-  private double ptWork;
-  private double compCurrent;
+  private final PneuHub pneuHub = PneuHub.getInstance();
 
   private final DigitalInput lsShooterHome = new DigitalInput(0);
   private final DigitalInput lsClimbLeft = new DigitalInput(1);
@@ -54,16 +49,8 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     alliance = DriverStation.getAlliance();
 
-    ptHigh = PnueHub.getPressure(0);
-    ptWork = PnueHub.getPressure(1);
-    compCurrent = PnueHub.getCompressorCurrent();
-
-    SmartDashboard.putNumber("PT High", ptHigh);
-    SmartDashboard.putNumber("PT Work", ptWork);
-    SmartDashboard.putNumber("Air Comp Amps", compCurrent);
-
     limeLight.updateMeasurements();
-
+    pneuHub.updateMeasurements();
     m_swerve.updateOdometry();
 
   }
@@ -76,7 +63,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-    // driveWithJoystick(false);
+    
     /*
      * if (timer.get() < 2) {
      * shooter.set(TalonFXControlMode.PercentOutput, -.7);
