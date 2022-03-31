@@ -41,7 +41,7 @@ public class Shooter {
     private ColorMatchResult match;
     private double currentPosition;
 
-    public void shoot(boolean shooterRun) {
+    public void shoot() {
         if (xboxCtrlr.getYButtonPressed()) {
             toggleMode();
           }
@@ -60,8 +60,7 @@ public class Shooter {
         IR = m_colorSensor.getIR();
         detectedColor = m_colorSensor.getColor();
         alliance = DriverStation.getAlliance();
-        this.shooterRun = shooterRun;
-
+        
         if (rightBumper & shooterHome) {
             shooterAngle.set(-.1);
         } else if (rightBumper & !shooterHome & !lefttBumper) {
@@ -96,9 +95,9 @@ public class Shooter {
 
         if (shooterRun) {
             if (colorAccept) {
-                Run(.4);
+                Run(.6);
             } else {
-                Run(.25);
+                Run(.6);
             }
         } else {
             Stop();
@@ -128,17 +127,17 @@ public class Shooter {
 
     public void updateMeasurements() {
         SmartDashboard.putNumber("Proximity", proximity);
-        SmartDashboard.putNumber("Red", detectedColor.red);
-        SmartDashboard.putNumber("Green", detectedColor.green);
-        SmartDashboard.putNumber("Blue", detectedColor.blue);
+        //SmartDashboard.putNumber("Red", detectedColor.red);
+        //SmartDashboard.putNumber("Green", detectedColor.green);
+        //SmartDashboard.putNumber("Blue", detectedColor.blue);
         SmartDashboard.putNumber("IR", IR);
 
         SmartDashboard.putBoolean("Right Bumper", rightBumper);
         SmartDashboard.putBoolean("Left Bumper", lefttBumper);
 
-        SmartDashboard.putNumber("Confidence", match.confidence);
-        SmartDashboard.putString("Alliance", alliance.toString());
-        SmartDashboard.putString("Color Detected", colorString);
+        //SmartDashboard.putNumber("Confidence", match.confidence);
+        //SmartDashboard.putString("Alliance", alliance.toString());
+       // SmartDashboard.putString("Color Detected", colorString);
 
         SmartDashboard.putBoolean("Shooter Run", shooterRun);
 

@@ -13,7 +13,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
-  public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
+  public static final double kMaxAngularSpeed = Math.PI * .8; // 1/2 rotation per second
   private final XboxController xboxCtrlr = new XboxController(0);
 
   private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
@@ -37,7 +37,7 @@ public class Drivetrain {
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(1);
   private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(1);
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(1);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(2);
 
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, navx.getRotation2d());
 
@@ -70,7 +70,7 @@ public class Drivetrain {
   }
 
   public void Reverse(double speed) {
-    drive(speed, 0, 0, false);
+    drive(-speed, 0, 0, false);
   }
 
   public void Stop() {

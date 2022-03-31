@@ -28,6 +28,7 @@ public class Robot extends TimedRobot {
     swerve.updateOdometry();
     climber.updateMeasurements();
     intake.updateMeasurements();
+    shooter.updateMeasurements();
   }
 
   private Timer timer = new Timer();
@@ -42,7 +43,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
 
     if (timer.get() < 2) {
-      shooter.Run(.7);
+      shooter.Run(.5);
     } else if (timer.get() < 5) {
       index.Forward(.3);
     } else if (timer.get() < 8) {
@@ -65,7 +66,7 @@ public class Robot extends TimedRobot {
     swerve.Drive(true);
     intake.intake(shooter.getMode());
     index.index(shooter.getMode());
-    shooter.shoot(shooter.getMode());
+    shooter.shoot();
     climber.climb();
   }
 }
