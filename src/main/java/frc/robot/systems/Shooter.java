@@ -19,10 +19,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class Shooter {
+
+    // #region Variables
     private final CANSparkMax shooterAngle = new CANSparkMax(5, MotorType.kBrushless);
     private final TalonFX shooter = new TalonFX(3);
     private final XboxController xboxCtrlr = new XboxController(0);
-    private Color detectedColor;
+    private Color detectedColor = Color.kBlue;
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
     private final DigitalInput lsShooterHome = new DigitalInput(0);
     private final ColorMatch m_colorMatcher = new ColorMatch();
@@ -39,13 +41,13 @@ public class Shooter {
     private Alliance alliance;
     public boolean shooterRun;
     private ColorMatchResult match;
-    private double currentPosition;
+    private double currentPosition; // #endregion
 
     public void shoot() {
         if (xboxCtrlr.getYButtonPressed()) {
             toggleMode();
-          }
-        
+        }
+
         currentPosition = shooterAngle.getEncoder().getPosition();
         shooterHome = lsShooterHome.get();
         shooterUp = currentPosition > 300;
@@ -60,15 +62,15 @@ public class Shooter {
         IR = m_colorSensor.getIR();
         detectedColor = m_colorSensor.getColor();
         alliance = DriverStation.getAlliance();
-        
+
         if (rightBumper & shooterHome) {
-            shooterAngle.set(-.1);
+            shooterAngle.set(-.08);
         } else if (rightBumper & !shooterHome & !lefttBumper) {
             shooterAngle.set(0);
             xboxCtrlr.setRumble(RumbleType.kLeftRumble, 1);
             xboxCtrlr.setRumble(RumbleType.kRightRumble, 1);
         } else if (lefttBumper & !rightBumper) {
-            shooterAngle.set(.1);
+            shooterAngle.set(.08);
         } else {
             shooterAngle.set(0);
             xboxCtrlr.setRumble(RumbleType.kLeftRumble, 0);
@@ -109,7 +111,7 @@ public class Shooter {
         shooter.set(TalonFXControlMode.PercentOutput, -speed);
     }
 
-    public void Stop(){
+    public void Stop() {
         shooter.set(TalonFXControlMode.PercentOutput, 0);
     }
 
@@ -117,27 +119,27 @@ public class Shooter {
         shooterAngle.getEncoder().setPosition(0);
     }
 
-    private void toggleMode(){
+    private void toggleMode() {
         shooterRun = !shooterRun;
     }
 
-    public boolean getMode(){
+    public boolean getMode() {
         return shooterRun;
     }
 
     public void updateMeasurements() {
         SmartDashboard.putNumber("Proximity", proximity);
-        //SmartDashboard.putNumber("Red", detectedColor.red);
-        //SmartDashboard.putNumber("Green", detectedColor.green);
-        //SmartDashboard.putNumber("Blue", detectedColor.blue);
+        SmartDashboard.putNumber("Red", detectedColor.red);
+        SmartDashboard.putNumber("Green", detectedColor.green);
+        SmartDashboard.putNumber("Blue", detectedColor.blue);
         SmartDashboard.putNumber("IR", IR);
 
         SmartDashboard.putBoolean("Right Bumper", rightBumper);
         SmartDashboard.putBoolean("Left Bumper", lefttBumper);
 
-        //SmartDashboard.putNumber("Confidence", match.confidence);
-        //SmartDashboard.putString("Alliance", alliance.toString());
-       // SmartDashboard.putString("Color Detected", colorString);
+        // SmartDashboard.putNumber("Confidence", match.confidence);
+        // SmartDashboard.putString("Alliance", alliance.toString());
+        SmartDashboard.putString("Color Detected", colorString);
 
         SmartDashboard.putBoolean("Shooter Run", shooterRun);
 
@@ -150,6 +152,7 @@ public class Shooter {
     private Shooter() {
         m_colorMatcher.addColorMatch(kBlueBall);
         m_colorMatcher.addColorMatch(kRedBall);
+        colorString = "Unknown";
     }
 
     private static final Shooter instance = new Shooter();

@@ -41,8 +41,6 @@ public class Drivetrain {
 
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, navx.getRotation2d());
 
-  
-
   public void Reset() {
     navx.reset();
   }

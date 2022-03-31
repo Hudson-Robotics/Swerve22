@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake {
+
+    //#region Variables
     private final TalonSRX intake = new TalonSRX(13);
 
     private final XboxController xboxCtrlr = new XboxController(0);
@@ -17,20 +19,16 @@ public class Intake {
     private final PneumaticHub PnueHub = new PneumaticHub(22);
     private final DoubleSolenoid intLeftCylinders = PnueHub.makeDoubleSolenoid(2, 3);
     private final DoubleSolenoid intRightCylinders = PnueHub.makeDoubleSolenoid(6, 7);
-    private boolean leftTriggerPressed;
     private boolean rightTriggerPressed;
-    private double leftTrigger;
     private double rightTrigger;
+    private boolean aButton;
+    private boolean bButton;
+    //#endregion
 
     public void intake(boolean shooterRun) {
-        leftTrigger = xboxCtrlr.getLeftTriggerAxis();
         rightTrigger = xboxCtrlr.getRightTriggerAxis();
-
-        if (leftTrigger > .5) {
-            leftTriggerPressed = true;
-        } else {
-            leftTriggerPressed = false;
-        }
+        aButton = xboxCtrlr.getAButton();
+        bButton = xboxCtrlr.getBButton();
 
         if (rightTrigger > .5) {
             rightTriggerPressed = true;
@@ -43,33 +41,40 @@ public class Intake {
         } else if (shooterRun && rightTriggerPressed) {
             Down();
         } else {
+            Off();
+        }
+
+        if (aButton || bButton || rightTriggerPressed) {
+            Run();
+        } else {
             Stop();
         }
     }
 
     private void Up() {
-        intake.set(TalonSRXControlMode.PercentOutput, -.7);
         intLeftCylinders.set(Value.kForward);
         intRightCylinders.set(Value.kForward);
     }
 
     private void Down() {
-        intake.set(TalonSRXControlMode.PercentOutput, -.7);
         intLeftCylinders.set(Value.kReverse);
         intRightCylinders.set(Value.kReverse);
+    }
 
+    private void Off() {
+        intLeftCylinders.set(Value.kOff);
+        intRightCylinders.set(Value.kOff);
     }
 
     private void Stop() {
         intake.set(TalonSRXControlMode.PercentOutput, 0);
-        intLeftCylinders.set(Value.kOff);
-        intRightCylinders.set(Value.kOff);
+    }
 
+    private void Run() {
+        intake.set(TalonSRXControlMode.PercentOutput, -.7);
     }
 
     public void updateMeasurements() {
-        SmartDashboard.putBoolean("Left Trigger Bool", leftTriggerPressed);
-        SmartDashboard.putNumber("Left Trigger Position", leftTrigger);
         SmartDashboard.putBoolean("Right Trigger Bool", rightTriggerPressed);
         SmartDashboard.putNumber("Right Trigger Position", rightTrigger);
     }

@@ -12,7 +12,8 @@ import frc.robot.systems.Shooter;
 import frc.robot.systems.DriveTrain.Drivetrain;
 
 public class Robot extends TimedRobot {
-
+  
+//#region Variables
   private final LimeLight limeLight = LimeLight.getInstance();
   private final Shooter shooter = Shooter.getInstance();
   private final Climber climber = Climber.getInstance();
@@ -20,6 +21,7 @@ public class Robot extends TimedRobot {
   private final Intake intake = Intake.getInstance();
   private final Drivetrain swerve = Drivetrain.getInstance();
   private final PneuHub pneuHub = PneuHub.getInstance();
+//#endregion
 
   @Override
   public void robotPeriodic() {
