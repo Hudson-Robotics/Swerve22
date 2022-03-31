@@ -2,6 +2,7 @@ package frc.robot.systems;
 
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.fasterxml.jackson.databind.annotation.JsonAppend.Prop;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
@@ -36,11 +37,15 @@ public class Shooter {
     private boolean shooterHome;
     private boolean shooterUp;
     private Alliance alliance;
-    private boolean shooterRun;
+    public boolean shooterRun;
     private ColorMatchResult match;
     private double currentPosition;
 
     public void shoot(boolean shooterRun) {
+        if (xboxCtrlr.getYButtonPressed()) {
+            toggleMode();
+          }
+        
         currentPosition = shooterAngle.getEncoder().getPosition();
         shooterHome = lsShooterHome.get();
         shooterUp = currentPosition > 300;
@@ -111,6 +116,14 @@ public class Shooter {
 
     public void resetEncoder() {
         shooterAngle.getEncoder().setPosition(0);
+    }
+
+    private void toggleMode(){
+        shooterRun = !shooterRun;
+    }
+
+    public boolean getMode(){
+        return shooterRun;
     }
 
     public void updateMeasurements() {

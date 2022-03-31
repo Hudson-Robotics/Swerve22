@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.Timer;
 
 import frc.robot.systems.Climber;
@@ -13,10 +12,6 @@ import frc.robot.systems.Shooter;
 import frc.robot.systems.DriveTrain.Drivetrain;
 
 public class Robot extends TimedRobot {
-
-  private final XboxController m_controller = new XboxController(0);
-
-  private boolean shooterRun;
 
   private final LimeLight limeLight = LimeLight.getInstance();
   private final Shooter shooter = Shooter.getInstance();
@@ -66,19 +61,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-
-  
-
-    boolean yButtonPress = m_controller.getYButtonPressed();
-
-    if (yButtonPress) {
-      shooterRun = !shooterRun;
-    }
-
     swerve.Drive(true);
-    intake.intake(shooterRun);
-    index.index(shooterRun);
-    shooter.shoot(shooterRun);
+    intake.intake(shooter.getMode());
+    index.index(shooter.getMode());
+    shooter.shoot(shooter.getMode());
     climber.climb();
   }
 }
