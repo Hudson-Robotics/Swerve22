@@ -27,6 +27,7 @@ public class Robot extends TimedRobot {
     pneuHub.updateMeasurements();
     swerve.updateOdometry();
     climber.updateMeasurements();
+    intake.updateMeasurements();
   }
 
   private Timer timer = new Timer();
