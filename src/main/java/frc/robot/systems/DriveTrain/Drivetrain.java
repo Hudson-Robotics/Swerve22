@@ -40,16 +40,24 @@ public class Drivetrain {
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(2);
 
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, navx.getRotation2d());
+  private double turbo;
 
   public void Reset() {
     navx.reset();
   }
 
   public void Drive(boolean fieldRelative) {
+
+    if (xboxCtrlr.getLeftTriggerAxis() > .5) {
+      turbo = 1;
+    } else {
+      turbo = .5;
+    }
+
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
     final double xSpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(xboxCtrlr.getLeftY(), 0.05))
-        * Drivetrain.kMaxSpeed;
+        * Drivetrain.kMaxSpeed * turbo;
 
     // Get the y speed or sideways/strafe speed. We are inverting this because
     // we want a positive value when we pull to the left. Xbox controllers

@@ -35,9 +35,9 @@ public class Index {
         SmartDashboard.putBoolean("Prox", prox);
 
         if (!aButton & xButton) {
-            Reverse(.3);
+            Reverse(.6);
         } else if (aButton & !prox) {
-            Forward(.3);
+            Forward(.6);
         } else if (bButton & shooterRun) {
             Forward(.3);
         } else {

@@ -11,18 +11,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Climber {
 
-    //#region Variables
+    // #region Variables
     private final CANSparkMax climbLeft = new CANSparkMax(14, MotorType.kBrushless);
     private final CANSparkMax climbRight = new CANSparkMax(9, MotorType.kBrushless);
-    
+
     private final XboxController xboxCtrlr = new XboxController(0);
-  
+
     private final PneumaticHub PnueHub = new PneumaticHub(22);
     private final DoubleSolenoid climbCylinders = PnueHub.makeDoubleSolenoid(0, 1);
 
     private double currentLeftPosition;
     private double currentRightPosition;
-    //#endregion
+    // #endregion
 
     public void climb() {
         currentLeftPosition = climbLeft.getEncoder().getPosition();
@@ -45,12 +45,12 @@ public class Climber {
 
         switch (povAngle) {
             case Up:
-                if (currentLeftPosition > -565) {
+                if (currentLeftPosition > -590) {
                     climbLeft.set(-1);
                 } else {
                     climbLeft.set(0);
                 }
-                if (currentRightPosition < 565) {
+                if (currentRightPosition < 600) {
                     climbRight.set(1);
                 } else {
                     climbRight.set(0);
@@ -58,12 +58,12 @@ public class Climber {
                 break;
             case Down:
                 if (currentLeftPosition < 0) {
-                    climbLeft.set(.6);
+                    climbLeft.set(.825);
                 } else {
                     climbLeft.set(0);
                 }
                 if (currentRightPosition > 0) {
-                    climbRight.set(-.6);
+                    climbRight.set(-.825);
                 } else {
                     climbRight.set(0);
                 }

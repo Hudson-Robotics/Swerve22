@@ -97,10 +97,10 @@ public class Shooter {
 
         if (shooterRun) {
             if (colorAccept) {
-                Run(.6);
+                Run(.47);
             } else {
-                Run(.6);
-            }
+                Run(.3);
+                }
         } else {
             Stop();
         }
