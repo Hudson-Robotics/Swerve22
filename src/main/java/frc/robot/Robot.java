@@ -43,9 +43,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-
     if (timer.get() < 3) {
-      shooter.Run(.5);
+      shooter.Run(.45);
     } else if (timer.get() < 6) {
       index.Forward(.3);
     } else if (timer.get() < 8) {
