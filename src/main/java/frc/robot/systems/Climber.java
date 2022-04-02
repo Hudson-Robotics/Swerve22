@@ -3,6 +3,7 @@ package frc.robot.systems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.XboxController;
@@ -22,6 +23,9 @@ public class Climber {
 
     private double currentLeftPosition;
     private double currentRightPosition;
+
+    private SlewRateLimiter leftRamp = new SlewRateLimiter(2);
+    private SlewRateLimiter rightRamp = new SlewRateLimiter(2);
     // #endregion
 
     public void climb() {
@@ -31,13 +35,13 @@ public class Climber {
         int pov = xboxCtrlr.getPOV();
         PovAngle povAngle;
 
-        if (pov == 0) {
+        if (pov == 0 || pov == 45 || pov == 135) {
             povAngle = PovAngle.Up;
         } else if (pov == 90) {
             povAngle = PovAngle.Right;
         } else if (pov == 180) {
             povAngle = PovAngle.Down;
-        } else if (pov == 270) {
+        } else if (pov == 270 || pov ==  225 || pov == 315) {
             povAngle = PovAngle.Left;
         } else {
             povAngle = PovAngle.Bad;
@@ -45,27 +49,27 @@ public class Climber {
 
         switch (povAngle) {
             case Up:
-                if (currentLeftPosition > -590) {
-                    climbLeft.set(-1);
+                if (currentLeftPosition > -625) {
+                    climbLeft.set(leftRamp.calculate(-1));
                 } else {
-                    climbLeft.set(0);
+                    climbLeft.set(leftRamp.calculate(0));
                 }
-                if (currentRightPosition < 600) {
-                    climbRight.set(1);
+                if (currentRightPosition < 647) {
+                    climbRight.set(rightRamp.calculate(1));
                 } else {
-                    climbRight.set(0);
+                    climbRight.set(rightRamp.calculate(0));
                 }
                 break;
             case Down:
                 if (currentLeftPosition < 0) {
-                    climbLeft.set(.825);
+                    climbLeft.set(leftRamp.calculate(.825));
                 } else {
-                    climbLeft.set(0);
+                    climbLeft.set(leftRamp.calculate(0));
                 }
                 if (currentRightPosition > 0) {
-                    climbRight.set(-.825);
+                    climbRight.set(rightRamp.calculate(-.825));
                 } else {
-                    climbRight.set(0);
+                    climbRight.set(rightRamp.calculate(0));
                 }
                 break;
             case Left:
@@ -82,10 +86,10 @@ public class Climber {
         }
 
         if (xboxCtrlr.getBackButton()) {
-            climbLeft.set(.4);
+            climbLeft.set(leftRamp.calculate(.4));
         }
         if (xboxCtrlr.getStartButton()) {
-            climbRight.set(-.4);
+            climbRight.set(rightRamp.calculate(-.4));
         }
     }
 

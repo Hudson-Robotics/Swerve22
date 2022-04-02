@@ -44,9 +44,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
-    if (timer.get() < 2) {
+    if (timer.get() < 3) {
       shooter.Run(.5);
-    } else if (timer.get() < 5) {
+    } else if (timer.get() < 6) {
       index.Forward(.3);
     } else if (timer.get() < 8) {
       swerve.Reverse(.3 * Drivetrain.kMaxSpeed);

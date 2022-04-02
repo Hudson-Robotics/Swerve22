@@ -1,7 +1,8 @@
 package frc.robot.systems;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorMatch;
@@ -41,9 +42,15 @@ public class Shooter {
     private Alliance alliance;
     public boolean shooterRun;
     private ColorMatchResult match;
-    private double currentPosition; // #endregion
+    private double currentPosition;
+    // #endregion
 
     public void shoot() {
+        int pov = xboxCtrlr.getPOV();
+        if (pov == 0 || pov == 45 || pov == 135) {
+           Stop();
+        }
+
         if (xboxCtrlr.getYButtonPressed()) {
             toggleMode();
         }
@@ -97,10 +104,10 @@ public class Shooter {
 
         if (shooterRun) {
             if (colorAccept) {
-                Run(.47);
+                Run(.55);
             } else {
                 Run(.3);
-                }
+            }
         } else {
             Stop();
         }
@@ -108,11 +115,23 @@ public class Shooter {
     }
 
     public void Run(double speed) {
-        shooter.set(TalonFXControlMode.PercentOutput, -speed);
+        // shooter.set(TalonFXControlMode.PercentOutput, -speed);
+        double rpmMax = 2000.0;
+
+        /**
+         * Convert 2000 RPM to units / 100ms.
+         * 2048 Units/Rev * 2000 RPM / 600 100ms/min in either direction:
+         * velocity setpoint is in units/100ms
+         */
+        double targetVelocity_UnitsPer100ms = speed * rpmMax * 2048.0 / 600.0;
+
+        /* 2000 RPM in either direction */
+        shooter.set(TalonFXControlMode.Velocity, targetVelocity_UnitsPer100ms);
     }
 
     public void Stop() {
         shooter.set(TalonFXControlMode.PercentOutput, 0);
+        shooterRun = false;
     }
 
     public void resetEncoder() {
@@ -153,6 +172,40 @@ public class Shooter {
         m_colorMatcher.addColorMatch(kBlueBall);
         m_colorMatcher.addColorMatch(kRedBall);
         colorString = "Unknown";
+
+        configPID();
+    }
+
+    private void configPID() {
+        int ID = 0;
+        int timeOutMS = 30;
+        double feedForward = .0005;
+        double proportional = .1;
+        double integral = 0.001;
+        double derivative = 5.0;
+
+        /* Factory Default all hardware to prevent unexpected behaviour */
+        shooter.configFactoryDefault();
+
+        /* Config neutral deadband to be the smallest possible */
+        shooter.configNeutralDeadband(0.001);
+
+        /* Config sensor used for Primary PID [Velocity] */
+        shooter.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
+                ID, timeOutMS);
+
+        /* Config the peak and nominal outputs */
+        shooter.configNominalOutputForward(0, timeOutMS);
+        shooter.configNominalOutputReverse(0, timeOutMS);
+        shooter.configPeakOutputForward(1, timeOutMS);
+        shooter.configPeakOutputReverse(-1, timeOutMS);
+
+        /* Config the Velocity closed loop gains in slot0 */
+        shooter.config_kF(ID, feedForward, timeOutMS);
+        shooter.config_kP(ID, proportional, timeOutMS);
+        shooter.config_kI(ID, integral, timeOutMS);
+        shooter.config_kD(ID, derivative, timeOutMS);
+
     }
 
     private static final Shooter instance = new Shooter();
