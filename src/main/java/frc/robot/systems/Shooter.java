@@ -115,8 +115,8 @@ public class Shooter {
     }
 
     public void Run(double speed) {
-        // shooter.set(TalonFXControlMode.PercentOutput, -speed);
-        double rpmMax = 2000.0;
+        shooter.set(TalonFXControlMode.PercentOutput, -speed);
+        double rpmMax = 5000.0;
 
         /**
          * Convert 2000 RPM to units / 100ms.
@@ -126,7 +126,7 @@ public class Shooter {
         double targetVelocity_UnitsPer100ms = speed * rpmMax * 2048.0 / 600.0;
 
         /* 2000 RPM in either direction */
-        shooter.set(TalonFXControlMode.Velocity, targetVelocity_UnitsPer100ms);
+        //shooter.set(TalonFXControlMode.Velocity, targetVelocity_UnitsPer100ms);
     }
 
     public void Stop() {
@@ -180,7 +180,7 @@ public class Shooter {
         int ID = 0;
         int timeOutMS = 30;
         double feedForward = .0005;
-        double proportional = .1;
+        double proportional = .15;
         double integral = 0.001;
         double derivative = 5.0;
 
