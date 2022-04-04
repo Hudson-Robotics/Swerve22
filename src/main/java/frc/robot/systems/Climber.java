@@ -52,24 +52,24 @@ public class Climber {
                 // if (currentLeftPosition > -625) {
                 climbLeft.set(leftRamp.calculate(-1));
                 // } else {
-                climbLeft.set(leftRamp.calculate(0));
+               // climbLeft.set(leftRamp.calculate(0));
                 // }
                 // if (currentRightPosition < 647) {
                 climbRight.set(rightRamp.calculate(1));
                 // } else {
-                climbRight.set(rightRamp.calculate(0));
+               // climbRight.set(rightRamp.calculate(0));
                 // }
                 break;
             case Down:
                 // if (currentLeftPosition < 0) {
                 climbLeft.set(leftRamp.calculate(.825));
                 // } else {
-                climbLeft.set(leftRamp.calculate(0));
+               // climbLeft.set(leftRamp.calculate(0));
                 // }
                 // if (currentRightPosition > 0) {
                 climbRight.set(rightRamp.calculate(-.825));
                 // } else {
-                climbRight.set(rightRamp.calculate(0));
+                //climbRight.set(rightRamp.calculate(0));
                 // }
                 break;
             case Left:
