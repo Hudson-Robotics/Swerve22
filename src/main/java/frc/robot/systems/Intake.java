@@ -5,46 +5,37 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake {
 
-    //#region Variables
+    // #region Variables
     private final TalonSRX intake = new TalonSRX(13);
 
-    private final XboxController xboxCtrlr = new XboxController(0);
+    private final Controller xboxCtrlr = Controller.getInstance();
 
     private final PneumaticHub PnueHub = new PneumaticHub(22);
     private final DoubleSolenoid intLeftCylinders = PnueHub.makeDoubleSolenoid(2, 3);
     private final DoubleSolenoid intRightCylinders = PnueHub.makeDoubleSolenoid(6, 7);
-    private boolean rightTriggerPressed;
-    private double rightTrigger;
+    private boolean rightTrigger;
     private boolean aButton;
     private boolean bButton;
-    //#endregion
+    // #endregion
 
     public void intake(boolean shooterRun) {
-        rightTrigger = xboxCtrlr.getRightTriggerAxis();
+        rightTrigger = xboxCtrlr.getRightTriggerPress();
         aButton = xboxCtrlr.getAButton();
         bButton = xboxCtrlr.getBButton();
 
-        if (rightTrigger > .5) {
-            rightTriggerPressed = true;
-        } else {
-            rightTriggerPressed = false;
-        }
-
-        if (shooterRun && !rightTriggerPressed) {
+        if (shooterRun && !rightTrigger) {
             Up();
-        } else if (shooterRun && rightTriggerPressed) {
+        } else if (shooterRun && rightTrigger) {
             Down();
         } else {
             Off();
         }
 
-        if (aButton || bButton || rightTriggerPressed) {
+        if (aButton || bButton || rightTrigger) {
             Run();
         } else {
             Stop();
@@ -72,11 +63,6 @@ public class Intake {
 
     private void Run() {
         intake.set(TalonSRXControlMode.PercentOutput, -.7);
-    }
-
-    public void updateMeasurements() {
-        SmartDashboard.putBoolean("Right Trigger Bool", rightTriggerPressed);
-        SmartDashboard.putNumber("Right Trigger Position", rightTrigger);
     }
 
     private static final Intake instance = new Intake();

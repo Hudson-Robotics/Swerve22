@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 
 import frc.robot.systems.Climber;
+import frc.robot.systems.Controller;
 import frc.robot.systems.Index;
 import frc.robot.systems.Intake;
 import frc.robot.systems.LimeLight;
@@ -23,6 +24,7 @@ public class Robot extends TimedRobot {
   private final Intake intake = Intake.getInstance();
   private final Drivetrain swerve = Drivetrain.getInstance();
   private final PneuHub pneuHub = PneuHub.getInstance();
+  private final Controller controller = Controller.getInstance();
   // #endregion
 
   @Override
@@ -31,8 +33,8 @@ public class Robot extends TimedRobot {
     pneuHub.updateMeasurements();
     swerve.updateOdometry();
     climber.updateMeasurements();
-    intake.updateMeasurements();
     shooter.updateMeasurements();
+    controller.updateMeasurements();
   }
 
   @Override

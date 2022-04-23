@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -16,7 +15,7 @@ public class Climber {
     private final CANSparkMax climbLeft = new CANSparkMax(14, MotorType.kBrushless);
     private final CANSparkMax climbRight = new CANSparkMax(9, MotorType.kBrushless);
 
-    private final XboxController xboxCtrlr = new XboxController(0);
+    private final Controller xboxCtrlr = Controller.getInstance();
 
     private final PneumaticHub PnueHub = new PneumaticHub(22);
     private final DoubleSolenoid climbCylinders = PnueHub.makeDoubleSolenoid(0, 1);
@@ -32,50 +31,35 @@ public class Climber {
         currentLeftPosition = climbLeft.getEncoder().getPosition();
         currentRightPosition = climbRight.getEncoder().getPosition();
 
-        int pov = xboxCtrlr.getPOV();
-        PovAngle povAngle;
-
-        if (pov == 0 || pov == 45 || pov == 135) {
-            povAngle = PovAngle.Up;
-        } else if (pov == 90) {
-            povAngle = PovAngle.Right;
-        } else if (pov == 180) {
-            povAngle = PovAngle.Down;
-        } else if (pov == 270 || pov == 225 || pov == 315) {
-            povAngle = PovAngle.Left;
-        } else {
-            povAngle = PovAngle.Bad;
-        }
-
-        switch (povAngle) {
-            case Up:
+       switch (xboxCtrlr.getPOV()) {
+            case North:
                 // if (currentLeftPosition > -625) {
-                climbLeft.set(leftRamp.calculate(-1));
+                climbLeft.set(leftRamp.calculate(-.5));
                 // } else {
                // climbLeft.set(leftRamp.calculate(0));
                 // }
                 // if (currentRightPosition < 647) {
-                climbRight.set(rightRamp.calculate(1));
+                climbRight.set(rightRamp.calculate(-.5));
                 // } else {
                // climbRight.set(rightRamp.calculate(0));
                 // }
                 break;
-            case Down:
+            case South:
                 // if (currentLeftPosition < 0) {
-                climbLeft.set(leftRamp.calculate(.825));
+                climbLeft.set(leftRamp.calculate(.375));
                 // } else {
                // climbLeft.set(leftRamp.calculate(0));
                 // }
                 // if (currentRightPosition > 0) {
-                climbRight.set(rightRamp.calculate(-.825));
+                climbRight.set(rightRamp.calculate(-.375));
                 // } else {
                 //climbRight.set(rightRamp.calculate(0));
                 // }
                 break;
-            case Left:
+            case West:
                 climbCylinders.set(Value.kForward);
                 break;
-            case Right:
+            case East:
                 climbCylinders.set(Value.kReverse);
                 break;
             default:
@@ -101,14 +85,6 @@ public class Climber {
     public void updateMeasurements() {
         SmartDashboard.putNumber("Encoder Left Arm", currentLeftPosition);
         SmartDashboard.putNumber("Encoder Right Arm", currentRightPosition);
-    }
-
-    private enum PovAngle {
-        Up,
-        Down,
-        Left,
-        Right,
-        Bad
     }
 
     private Climber() {

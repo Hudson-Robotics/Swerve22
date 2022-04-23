@@ -13,18 +13,17 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.systems.Controller.PovAngle;
 
 public class Shooter {
 
     // #region Variables
     private final CANSparkMax shooterAngle = new CANSparkMax(5, MotorType.kBrushless);
     private final TalonFX shooter = new TalonFX(3);
-    private final XboxController xboxCtrlr = new XboxController(0);
+    private final Controller xboxCtrlr = Controller.getInstance();
     private Color detectedColor = Color.kBlue;
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
     private final DigitalInput lsShooterHome = new DigitalInput(0);
@@ -46,9 +45,9 @@ public class Shooter {
     // #endregion
 
     public void shoot() {
-        int pov = xboxCtrlr.getPOV();
-        if (pov == 0 || pov == 45 || pov == 135) {
-           Stop();
+        PovAngle pov = xboxCtrlr.getPOV();
+        if (pov == PovAngle.North || pov == PovAngle.NW || pov == PovAngle.NE) {
+            Stop();
         }
 
         if (xboxCtrlr.getYButtonPressed()) {
@@ -74,14 +73,12 @@ public class Shooter {
             shooterAngle.set(-.08);
         } else if (rightBumper & !shooterHome & !lefttBumper) {
             shooterAngle.set(0);
-            xboxCtrlr.setRumble(RumbleType.kLeftRumble, 1);
-            xboxCtrlr.setRumble(RumbleType.kRightRumble, 1);
+            xboxCtrlr.setRumble(1);
         } else if (lefttBumper & !rightBumper) {
             shooterAngle.set(.08);
         } else {
             shooterAngle.set(0);
-            xboxCtrlr.setRumble(RumbleType.kLeftRumble, 0);
-            xboxCtrlr.setRumble(RumbleType.kRightRumble, 0);
+            xboxCtrlr.stopRumble();
         }
 
         colorString = "Unknown";
@@ -116,17 +113,17 @@ public class Shooter {
 
     public void Run(double speed) {
         shooter.set(TalonFXControlMode.PercentOutput, -speed);
-       // double rpmMax = 5000.0;
+        // double rpmMax = 5000.0;
 
         /**
          * Convert 2000 RPM to units / 100ms.
          * 2048 Units/Rev * 2000 RPM / 600 100ms/min in either direction:
          * velocity setpoint is in units/100ms
          */
-       // double targetVelocity_UnitsPer100ms = speed * rpmMax * 2048.0 / 600.0;
+        // double targetVelocity_UnitsPer100ms = speed * rpmMax * 2048.0 / 600.0;
 
         /* 2000 RPM in either direction */
-        //shooter.set(TalonFXControlMode.Velocity, targetVelocity_UnitsPer100ms);
+        // shooter.set(TalonFXControlMode.Velocity, targetVelocity_UnitsPer100ms);
     }
 
     public void Stop() {

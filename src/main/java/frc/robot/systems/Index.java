@@ -4,7 +4,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.I2C;
 
@@ -12,7 +11,7 @@ public class Index {
     private final CANSparkMax indexTop = new CANSparkMax(10, MotorType.kBrushless);
     private final CANSparkMax indexBottom = new CANSparkMax(11, MotorType.kBrushless);
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
-    private final XboxController xboxCtrlr = new XboxController(0);
+    private final Controller xboxCtrlr = Controller.getInstance();
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
     private int proximity = 0;
 
@@ -29,9 +28,7 @@ public class Index {
             prox = false;
         }
 
-        SmartDashboard.putBoolean("A Button", aButton);
-        SmartDashboard.putBoolean("B Button", bButton);
-        SmartDashboard.putBoolean("X Button", xButton);
+       
         SmartDashboard.putBoolean("Prox", prox);
 
         if (!aButton & xButton) {
