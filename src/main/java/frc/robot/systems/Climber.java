@@ -33,25 +33,29 @@ public class Climber {
 
        switch (xboxCtrlr.getPOV()) {
             case North:
+            case NE:
+            case NW:
                 // if (currentLeftPosition > -625) {
-                climbLeft.set(leftRamp.calculate(-.5));
+                climbLeft.set(leftRamp.calculate(-.75));
                 // } else {
                // climbLeft.set(leftRamp.calculate(0));
                 // }
                 // if (currentRightPosition < 647) {
-                climbRight.set(rightRamp.calculate(-.5));
+                climbRight.set(rightRamp.calculate(.75));
                 // } else {
                // climbRight.set(rightRamp.calculate(0));
                 // }
                 break;
             case South:
+            case SE:
+            case SW:
                 // if (currentLeftPosition < 0) {
-                climbLeft.set(leftRamp.calculate(.375));
+                climbLeft.set(leftRamp.calculate(.5));
                 // } else {
                // climbLeft.set(leftRamp.calculate(0));
                 // }
                 // if (currentRightPosition > 0) {
-                climbRight.set(rightRamp.calculate(-.375));
+                climbRight.set(rightRamp.calculate(-.5));
                 // } else {
                 //climbRight.set(rightRamp.calculate(0));
                 // }
@@ -70,10 +74,10 @@ public class Climber {
         }
 
         if (xboxCtrlr.getBackButton()) {
-            climbLeft.set(leftRamp.calculate(.4));
+            climbLeft.set(leftRamp.calculate(.2));
         }
         if (xboxCtrlr.getStartButton()) {
-            climbRight.set(rightRamp.calculate(-.4));
+            climbRight.set(rightRamp.calculate(-.2));
         }
     }
 

@@ -12,6 +12,7 @@ public class Controller {
     public static Controller getInstance() {
         return instance;
     }
+
     public boolean getLeftBumperPressed() {
         return xboxCtrlr.getLeftBumperPressed();
     }
@@ -21,7 +22,7 @@ public class Controller {
     }
 
     public double getLeftX() {
-        return getLeftX();
+        return xboxCtrlr.getLeftX();
     }
 
     public double getLeftY() {
@@ -31,20 +32,29 @@ public class Controller {
     public double getRightX() {
         return xboxCtrlr.getRightX();
     }
+
     public double getRightY() {
         return xboxCtrlr.getRightY();
     }
 
     public PovAngle getPOV() {
         int rawAngle = xboxCtrlr.getPOV();
-        if (rawAngle == 0 || rawAngle == 45 || rawAngle == 135) {
+        if (rawAngle == 0) {
             return PovAngle.North;
+        } else if (rawAngle == 45) {
+            return PovAngle.NE;
         } else if (rawAngle == 90) {
             return PovAngle.East;
+        } else if (rawAngle == 135) {
+            return PovAngle.SE;
         } else if (rawAngle == 180) {
             return PovAngle.South;
-        } else if (rawAngle == 270 || rawAngle == 225 || rawAngle == 315) {
+        } else if (rawAngle == 225) {
+            return PovAngle.SW;
+        } else if (rawAngle == 270) {
             return PovAngle.West;
+        } else if (rawAngle == 315) {
+            return PovAngle.NW;
         } else {
             return PovAngle.Bad;
         }

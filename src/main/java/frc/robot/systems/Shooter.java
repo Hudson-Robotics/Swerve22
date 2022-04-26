@@ -70,12 +70,12 @@ public class Shooter {
         alliance = DriverStation.getAlliance();
 
         if (rightBumper & shooterHome) {
-            shooterAngle.set(-.08);
+            shooterAngle.set(-.04);
         } else if (rightBumper & !shooterHome & !lefttBumper) {
             shooterAngle.set(0);
             xboxCtrlr.setRumble(1);
         } else if (lefttBumper & !rightBumper) {
-            shooterAngle.set(.08);
+            shooterAngle.set(.04);
         } else {
             shooterAngle.set(0);
             xboxCtrlr.stopRumble();
@@ -101,9 +101,9 @@ public class Shooter {
 
         if (shooterRun) {
             if (colorAccept) {
-                Run(.55);
+                Run(.4);
             } else {
-                Run(.3);
+                Run(.4);
             }
         } else {
             Stop();
