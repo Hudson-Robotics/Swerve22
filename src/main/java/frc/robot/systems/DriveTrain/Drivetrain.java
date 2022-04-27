@@ -13,7 +13,8 @@ import frc.robot.systems.Controller;
 import com.kauailabs.navx.frc.AHRS;
 
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // 3 meters per second
+  // public static final double kMaxSpeed = 3.0; // 3 meters per second
+  public static final double kMaxSpeed = 1.1; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI * .8; // 1/2 rotation per second
   private final Controller xboxCtrlr = Controller.getInstance();
 
@@ -64,14 +65,14 @@ public class Drivetrain {
     // we want a positive value when we pull to the left. Xbox controllers
     // return positive values when you pull to the right by default.
     final double ySpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(xboxCtrlr.getLeftX(), 0.05))
-        * Drivetrain.kMaxSpeed;
+        * Drivetrain.kMaxSpeed * turbo;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
     final double rot = -m_rotLimiter.calculate(MathUtil.applyDeadband(xboxCtrlr.getRightX(), 0.05))
-        * Drivetrain.kMaxAngularSpeed;
+        * Drivetrain.kMaxAngularSpeed * turbo;
 
     drive(xSpeed, ySpeed, rot, fieldRelative);
   }

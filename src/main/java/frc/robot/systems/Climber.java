@@ -31,34 +31,34 @@ public class Climber {
         currentLeftPosition = climbLeft.getEncoder().getPosition();
         currentRightPosition = climbRight.getEncoder().getPosition();
 
-       switch (xboxCtrlr.getPOV()) {
+        switch (xboxCtrlr.getPOV()) {
             case North:
             case NE:
             case NW:
-                // if (currentLeftPosition > -625) {
-                climbLeft.set(leftRamp.calculate(-.75));
-                // } else {
-               // climbLeft.set(leftRamp.calculate(0));
-                // }
-                // if (currentRightPosition < 647) {
-                climbRight.set(rightRamp.calculate(.75));
-                // } else {
-               // climbRight.set(rightRamp.calculate(0));
-                // }
+                if (currentLeftPosition > -138) {
+                    climbLeft.set(leftRamp.calculate(-.75));
+                } else {
+                    climbLeft.set(leftRamp.calculate(0));
+                }
+                if (currentRightPosition < 120) {
+                    climbRight.set(rightRamp.calculate(.75));
+                } else {
+                    climbRight.set(rightRamp.calculate(0));
+                }
                 break;
             case South:
             case SE:
             case SW:
-                // if (currentLeftPosition < 0) {
-                climbLeft.set(leftRamp.calculate(.5));
-                // } else {
-               // climbLeft.set(leftRamp.calculate(0));
-                // }
-                // if (currentRightPosition > 0) {
-                climbRight.set(rightRamp.calculate(-.5));
-                // } else {
-                //climbRight.set(rightRamp.calculate(0));
-                // }
+                if (currentLeftPosition < 0) {
+                    climbLeft.set(leftRamp.calculate(.5));
+                } else {
+                    climbLeft.set(leftRamp.calculate(0));
+                }
+                if (currentRightPosition > 0) {
+                    climbRight.set(rightRamp.calculate(-.5));
+                } else {
+                    climbRight.set(rightRamp.calculate(0));
+                }
                 break;
             case West:
                 climbCylinders.set(Value.kForward);
