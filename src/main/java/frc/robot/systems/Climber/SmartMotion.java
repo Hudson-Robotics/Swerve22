@@ -70,11 +70,11 @@ public class SmartMotion {
         SmartDashboard.putNumber("Min Velocity", minVel);
         SmartDashboard.putNumber("Max Acceleration", maxAcc);
         SmartDashboard.putNumber("Allowed Closed Loop Error", allowedErr);
-       // SmartDashboard.putNumber("Set Position", 0);
-       // SmartDashboard.putNumber("Set Velocity", 0);
+        // SmartDashboard.putNumber("Set Position", 0);
+        // SmartDashboard.putNumber("Set Velocity", 0);
 
         // button to toggle between velocity and smart motion modes
-        //SmartDashboard.putBoolean("Mode", true);
+        // SmartDashboard.putBoolean("Mode", true);
 
     }
 
@@ -135,9 +135,12 @@ public class SmartMotion {
             allowedErr = allE;
         }
 
-        double setPoint, processVariable;
-        boolean mode = SmartDashboard.getBoolean("Mode", false);
-        if (mode) {
+    }
+
+    public void Set(double setPoint, positionMode mode) {
+        double processVariable;
+
+        if (mode == positionMode.kVelocity) {
             setPoint = SmartDashboard.getNumber("Set Velocity", 0);
             m_pidController.setReference(setPoint, CANSparkMax.ControlType.kVelocity);
             processVariable = m_encoder.getVelocity();
@@ -151,9 +154,17 @@ public class SmartMotion {
             m_pidController.setReference(setPoint, CANSparkMax.ControlType.kSmartMotion);
             processVariable = m_encoder.getPosition();
         }
+        SmartDashboard.putNumber(Name + "Process Variable", processVariable);
+        SmartDashboard.putNumber(Name +"Output", m_motor.getOutputCurrent());
 
-        SmartDashboard.putNumber("Process Variable", processVariable);
-        SmartDashboard.putNumber("Output", m_motor.getOutputCurrent());
     }
 
+    public void resetEncoders() {
+        m_motor.getEncoder().setPosition(0);
+    }
+
+    public enum positionMode {
+        kVelocity,
+        kPosition
+    }
 }

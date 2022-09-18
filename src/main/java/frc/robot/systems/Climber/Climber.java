@@ -1,20 +1,25 @@
 package frc.robot.systems.Climber;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+// import com.revrobotics.CANSparkMax;
+// import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
+// import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.systems.Controller;
+import frc.robot.systems.Climber.SmartMotion.positionMode;
 
 public class Climber {
 
     // #region Variables
-    private final CANSparkMax climbLeft = new CANSparkMax(14, MotorType.kBrushless);
-    private final CANSparkMax climbRight = new CANSparkMax(9, MotorType.kBrushless);
+    // private final CANSparkMax climbLeft = new CANSparkMax(14,
+    // MotorType.kBrushless);
+    // private final CANSparkMax climbRight = new CANSparkMax(9,
+    // MotorType.kBrushless);
+    private final SmartMotion climbLeft = new SmartMotion(14, "Climb Left");
+    private final SmartMotion climbRight = new SmartMotion(14, "Climb Right");
 
     private final Controller xboxCtrlr = Controller.getInstance();
 
@@ -24,42 +29,46 @@ public class Climber {
     private double currentLeftPosition;
     private double currentRightPosition;
 
-    private SlewRateLimiter leftRamp = new SlewRateLimiter(2);
-    private SlewRateLimiter rightRamp = new SlewRateLimiter(2);
+    // private SlewRateLimiter leftRamp = new SlewRateLimiter(2);
+    // private SlewRateLimiter rightRamp = new SlewRateLimiter(2);
     // #endregion
 
     public void climb() {
-        currentLeftPosition = climbLeft.getEncoder().getPosition();
-        currentRightPosition = climbRight.getEncoder().getPosition();
+        // currentLeftPosition = climbLeft.getEncoder().getPosition();
+        // currentRightPosition = climbRight.getEncoder().getPosition();
 
         switch (xboxCtrlr.getPOV()) {
             case North:
             case NE:
             case NW:
-                if (currentLeftPosition > -138) {
-                    climbLeft.set(leftRamp.calculate(-.75));
-                } else {
-                    climbLeft.set(leftRamp.calculate(0));
-                }
-                if (currentRightPosition < 120) {
-                    climbRight.set(rightRamp.calculate(.75));
-                } else {
-                    climbRight.set(rightRamp.calculate(0));
-                }
+            climbLeft.Set(-120, positionMode.kPosition);
+            climbRight.Set(120, positionMode.kPosition);
+                // if (currentLeftPosition > -138) {
+                //     climbLeft.set(leftRamp.calculate(-.75));
+                // } else {
+                //     climbLeft.set(leftRamp.calculate(0));
+                // }
+                // if (currentRightPosition < 120) {
+                //     climbRight.set(rightRamp.calculate(.75));
+                // } else {
+                //     climbRight.set(rightRamp.calculate(0));
+                // }
                 break;
             case South:
             case SE:
             case SW:
-                if (currentLeftPosition < 0) {
-                    climbLeft.set(leftRamp.calculate(.5));
-                } else {
-                    climbLeft.set(leftRamp.calculate(0));
-                }
-                if (currentRightPosition > 0) {
-                    climbRight.set(rightRamp.calculate(-.5));
-                } else {
-                    climbRight.set(rightRamp.calculate(0));
-                }
+                climbLeft.Set(0, positionMode.kPosition);
+                climbRight.Set(0, positionMode.kPosition);
+                // if (currentLeftPosition < 0) {
+                // climbLeft.set(leftRamp.calculate(.5));
+                // } else {
+                // climbLeft.set(leftRamp.calculate(0));
+                // }
+                // if (currentRightPosition > 0) {
+                // climbRight.set(rightRamp.calculate(-.5));
+                // } else {
+                // climbRight.set(rightRamp.calculate(0));
+                // }
                 break;
             case West:
                 climbCylinders.set(Value.kForward);
@@ -68,26 +77,32 @@ public class Climber {
                 climbCylinders.set(Value.kReverse);
                 break;
             default:
-                climbLeft.set(0);
-                climbRight.set(0);
+                // climbLeft.set(0);
+                // climbRight.set(0);
+                climbLeft.Set(0, positionMode.kVelocity);
+                climbRight.Set(0, positionMode.kVelocity);
                 climbCylinders.set(Value.kOff);
                 break;
         }
 
         if (xboxCtrlr.getBackButton()) {
-            climbLeft.set(leftRamp.calculate(.2));
+            // climbLeft.set(leftRamp.calculate(.2));
+            climbLeft.Set(200, positionMode.kVelocity);
         }
         if (xboxCtrlr.getStartButton()) {
-            climbRight.set(rightRamp.calculate(-.2));
+            // climbRight.set(rightRamp.calculate(-.2));
+            climbRight.Set(-200, positionMode.kVelocity);
         }
     }
 
     public void resetEncoders() {
-        climbLeft.getEncoder().setPosition(0);
-        climbRight.getEncoder().setPosition(0);
+        climbLeft.resetEncoders();
+        climbRight.resetEncoders();
     }
 
     public void updateMeasurements() {
+        climbLeft.UpdateMeasurements();
+        climbRight.UpdateMeasurements();
         SmartDashboard.putNumber("Encoder Left Arm", currentLeftPosition);
         SmartDashboard.putNumber("Encoder Right Arm", currentRightPosition);
     }
