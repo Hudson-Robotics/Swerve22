@@ -68,6 +68,14 @@ public class Controller {
         return xboxCtrlr.getStartButton();
     }
 
+    public boolean getLeftStickButtonPressed(){
+        return xboxCtrlr.getLeftStickButtonPressed();        
+    }
+
+    public boolean getRightStickButtonPressed(){
+        return xboxCtrlr.getRightStickButtonPressed();        
+    }
+
     public void setRumble(float Amount) {
         xboxCtrlr.setRumble(RumbleType.kLeftRumble, Amount);
         xboxCtrlr.setRumble(RumbleType.kRightRumble, Amount);

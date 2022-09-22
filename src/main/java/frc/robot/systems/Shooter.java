@@ -42,6 +42,9 @@ public class Shooter {
     public boolean shooterRun;
     private ColorMatchResult match;
     private double currentPosition;
+
+    public boolean shooterSpeedLow;
+    private double shootSpeed = .4;
     // #endregion
 
     public void shoot() {
@@ -64,6 +67,11 @@ public class Shooter {
 
         rightBumper = xboxCtrlr.getRightBumper();
         lefttBumper = xboxCtrlr.getLeftBumper();
+
+        if (xboxCtrlr.getRightStickButtonPressed()) {
+            toggleSpeed();
+        }
+
         proximity = m_colorSensor.getProximity();
         IR = m_colorSensor.getIR();
         detectedColor = m_colorSensor.getColor();
@@ -100,10 +108,23 @@ public class Shooter {
         // }
 
         if (shooterRun) {
+            if (!shooterSpeedLow) {
+                shootSpeed = .75;
+                //xboxCtrlr.setRumble(1);
+                //xboxCtrlr.stopRumble();
+                //xboxCtrlr.setRumble(1);
+                //xboxCtrlr.stopRumble();
+            }
+            if (shooterSpeedLow) {
+                shootSpeed = .4;
+                //xboxCtrlr.setRumble(1);
+                //xboxCtrlr.stopRumble();
+            }
+
             if (colorAccept) {
-                Run(.4);
+                Run(shootSpeed); // <-- shooter motor speed was set to .4 for elelmentary kids
             } else {
-                Run(.4);
+                Run(.4); // <-- spit out wrong color ball at slow speed
             }
         } else {
             Stop();
@@ -139,6 +160,10 @@ public class Shooter {
         shooterRun = !shooterRun;
     }
 
+    private void toggleSpeed() {
+        shooterSpeedLow = !shooterSpeedLow;
+    }
+
     public boolean getMode() {
         return shooterRun;
     }
@@ -163,6 +188,7 @@ public class Shooter {
         SmartDashboard.putBoolean("Shooter Home", shooterHome);
         SmartDashboard.putBoolean("Shooter Max Up", shooterUp);
 
+        SmartDashboard.putNumber("Shooter Speed", shootSpeed);
     }
 
     private Shooter() {
