@@ -44,8 +44,8 @@ public class SmartMotion {
         maxRPM = 5700;
 
         // Smart Motion Coefficients
-        maxVel = 3000; // rpm
-        maxAcc = 1500;
+        maxVel = 4000; // rpm
+        maxAcc = 3000;
 
         // set PID coefficients
         m_pidController.setP(kP);
