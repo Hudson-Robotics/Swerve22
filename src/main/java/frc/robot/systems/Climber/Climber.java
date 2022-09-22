@@ -19,7 +19,7 @@ public class Climber {
     // private final CANSparkMax climbRight = new CANSparkMax(9,
     // MotorType.kBrushless);
     private final SmartMotion climbLeft = new SmartMotion(14, "Climb Left");
-    private final SmartMotion climbRight = new SmartMotion(14, "Climb Right");
+    private final SmartMotion climbRight = new SmartMotion(9, "Climb Right");
 
     private final Controller xboxCtrlr = Controller.getInstance();
 
@@ -36,22 +36,27 @@ public class Climber {
     public void climb() {
         // currentLeftPosition = climbLeft.getEncoder().getPosition();
         // currentRightPosition = climbRight.getEncoder().getPosition();
+        // climbLeft.UpdateLoopSettings();
+        // climbRight.UpdateLoopSettings();
+
+        currentLeftPosition = climbLeft.getEncoder();
+        currentRightPosition = climbRight.getEncoder();
 
         switch (xboxCtrlr.getPOV()) {
             case North:
             case NE:
             case NW:
-            climbLeft.Set(-120, positionMode.kPosition);
-            climbRight.Set(120, positionMode.kPosition);
+                climbLeft.Set(-136, positionMode.kPosition);
+                climbRight.Set(134, positionMode.kPosition);
                 // if (currentLeftPosition > -138) {
-                //     climbLeft.set(leftRamp.calculate(-.75));
+                // climbLeft.set(leftRamp.calculate(-.75));
                 // } else {
-                //     climbLeft.set(leftRamp.calculate(0));
+                // climbLeft.set(leftRamp.calculate(0));
                 // }
                 // if (currentRightPosition < 120) {
-                //     climbRight.set(rightRamp.calculate(.75));
+                // climbRight.set(rightRamp.calculate(.75));
                 // } else {
-                //     climbRight.set(rightRamp.calculate(0));
+                // climbRight.set(rightRamp.calculate(0));
                 // }
                 break;
             case South:
@@ -79,20 +84,25 @@ public class Climber {
             default:
                 // climbLeft.set(0);
                 // climbRight.set(0);
-                climbLeft.Set(0, positionMode.kVelocity);
-                climbRight.Set(0, positionMode.kVelocity);
+                // climbLeft.Set(0, positionMode.kVelocity);
+                // climbRight.Set(0, positionMode.kVelocity);
+                climbLeft.Set(currentLeftPosition, positionMode.kPosition);
+                climbRight.Set(currentRightPosition, positionMode.kPosition);
                 climbCylinders.set(Value.kOff);
                 break;
         }
 
         if (xboxCtrlr.getBackButton()) {
             // climbLeft.set(leftRamp.calculate(.2));
-            climbLeft.Set(200, positionMode.kVelocity);
+            // climbLeft.Set(2000, positionMode.kVelocity);
+            climbLeft.Set(currentLeftPosition + 6, positionMode.kPosition);
         }
         if (xboxCtrlr.getStartButton()) {
             // climbRight.set(rightRamp.calculate(-.2));
-            climbRight.Set(-200, positionMode.kVelocity);
+            // climbRight.Set(-2000, positionMode.kVelocity);
+            climbRight.Set(currentRightPosition - 6, positionMode.kPosition);
         }
+
     }
 
     public void resetEncoders() {

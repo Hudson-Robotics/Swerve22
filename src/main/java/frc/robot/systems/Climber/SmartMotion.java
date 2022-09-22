@@ -26,17 +26,25 @@ public class SmartMotion {
         m_encoder = m_motor.getEncoder();
 
         // PID coefficients
+        // kP = 5e-5;
+        // kI = 1e-6;
+        // kD = 0;
+        // kIz = 0;
+        // kFF = 0.000156;
+        // kMaxOutput = 1;
+        // kMinOutput = -1;
+        // maxRPM = 5700;
         kP = 5e-5;
         kI = 1e-6;
         kD = 0;
         kIz = 0;
-        kFF = 0.000156;
+        kFF = 0.0005;
         kMaxOutput = 1;
         kMinOutput = -1;
         maxRPM = 5700;
 
         // Smart Motion Coefficients
-        maxVel = 2000; // rpm
+        maxVel = 3000; // rpm
         maxAcc = 1500;
 
         // set PID coefficients
@@ -141,11 +149,11 @@ public class SmartMotion {
         double processVariable;
 
         if (mode == positionMode.kVelocity) {
-            setPoint = SmartDashboard.getNumber("Set Velocity", 0);
+            // setPoint = SmartDashboard.getNumber("Set Velocity", 0);
             m_pidController.setReference(setPoint, CANSparkMax.ControlType.kVelocity);
             processVariable = m_encoder.getVelocity();
         } else {
-            setPoint = SmartDashboard.getNumber("Set Position", 0);
+            // setPoint = SmartDashboard.getNumber("Set Position", 0);
             /**
              * As with other PID modes, Smart Motion is set by calling the
              * setReference method on an existing pid object and setting
@@ -154,13 +162,18 @@ public class SmartMotion {
             m_pidController.setReference(setPoint, CANSparkMax.ControlType.kSmartMotion);
             processVariable = m_encoder.getPosition();
         }
-        SmartDashboard.putNumber(Name + "Process Variable", processVariable);
-        SmartDashboard.putNumber(Name +"Output", m_motor.getOutputCurrent());
+        SmartDashboard.putNumber(Name + " Encoder", m_motor.getEncoder().getPosition());
+        SmartDashboard.putNumber(Name + " Process Variable", processVariable);
+        SmartDashboard.putNumber(Name + " Output", m_motor.getOutputCurrent());
 
     }
 
     public void resetEncoders() {
         m_motor.getEncoder().setPosition(0);
+    }
+
+    public double getEncoder() {
+        return m_motor.getEncoder().getPosition();
     }
 
     public enum positionMode {
