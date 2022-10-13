@@ -109,7 +109,7 @@ public class Shooter {
 
         if (shooterRun) {
             if (!shooterSpeedLow) {
-                shootSpeed = .75;
+                shootSpeed = .60;
                 //xboxCtrlr.setRumble(1);
                 //xboxCtrlr.stopRumble();
                 //xboxCtrlr.setRumble(1);

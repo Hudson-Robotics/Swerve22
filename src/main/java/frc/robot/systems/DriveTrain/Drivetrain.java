@@ -53,7 +53,7 @@ public class Drivetrain {
     if (xboxCtrlr.getLeftTriggerAxis() > .5) {
       turbo = 1;
     } else {
-      turbo = .5;
+      turbo = .7;
     }
 
     // Get the x speed. We are inverting this because Xbox controllers return
